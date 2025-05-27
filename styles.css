@@ -1,0 +1,354 @@
+/* styles.css */
+body {
+    padding-top: 70px;
+}
+
+/* Container für den Bibeltext */
+.verse-container {
+    line-height: 1.8; /* Sorgt für einen guten Zeilenabstand */
+    text-align: justify; /* Blocksatz für ein ruhigeres Schriftbild */
+}
+
+/* Versnummern-Styling */
+.verse-num {
+    font-size: 0.7em;
+    font-weight: bold;
+    color: #888;
+    vertical-align: super;
+    margin-right: 2px; /* Reduzierter Abstand zum Text */
+}
+
+/* Vers-Text-Styling */
+.verse {
+    cursor: pointer;
+    padding: 3px 2px; /* Etwas mehr vertikaler, weniger horizontaler Innenabstand */
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.verse:hover {
+    background-color: #e9ecef; /* Sanftes Grau beim Überfahren mit der Maus */
+}
+
+/* --- Popover & Sonstiges --- */
+.navbar {
+    margin-bottom: 1rem;
+}
+
+.popover {
+    max-width: 280px;
+}
+
+.popover .list-group-item {
+    padding: 0.5rem 1rem;
+}
+
+/* Hervorhebung in den Suchergebnissen */
+.search-result-text strong {
+    background-color: #fff3cd; 
+    padding: 0 2px;
+}
+
+/* Korrektur für die Farbanzeige auf der Markierungs-Seite (Legende) */
+.list-group-item .badge { /* Gilt für Badges innerhalb von Listenelementen, falls Sie das dort auch nutzen */
+    /* color: #000; */ /* Textfarbe wird durch die .bg-*-custom Klassen gesetzt */
+}
+.badge.bg-warning { /* Stellt sicher, dass Bootstrap Standard .bg-warning auch Textfarbe setzt, falls nötig */
+    color: #000 !important; 
+}
+
+
+/*
+============================================================
+--- Globale Farbdefinitionen für Markierungen (Hell-Modus) ---
+============================================================
+*/
+/* Diese Klassen gelten jetzt allgemein, nicht nur für .verse */
+
+.bg-warning { /* Wichtig (Gelb) - Bootstrap Standard, hier ggf. leicht angepasst für Konsistenz */
+    background-color: #ffe082 !important; 
+    color: #000 !important;
+}
+.bg-green-custom { /* Verheißung (Grün) */
+    background-color: #a5d6a7 !important; 
+    color: #000 !important;
+}
+.bg-blue-custom { /* Gebot (Blau) */
+    background-color: #90caf9 !important; 
+    color: #000 !important;
+}
+.bg-red-custom { /* Sünde/Warnung (Rot) */
+    background-color: #ef9a9a !important; 
+    color: #000 !important;
+}
+.bg-orange-custom { /* Prophetie (Orange) */
+    background-color: #ffcc80 !important; 
+    color: #000 !important;
+}
+.bg-brown-custom { /* Geschichte (Braun) */
+    background-color: #d2b48c !important; 
+    color: #000 !important;
+}
+.bg-gray-custom { /* Unklar (Grau) */
+    background-color: #d6d8db !important; 
+    color: #000 !important;
+}
+.bg-parable-custom { /* Gleichnis (Türkis/Mint) */
+    background-color: #a0e6d7 !important;
+    color: #000 !important;
+}
+.bg-rebuke-custom { /* Zurechtweisung (Lavendel) */
+    background-color: #d1c4e9 !important;
+    color: #000 !important;
+}
+.bg-name-custom { /* Namen (Olivgrün) */
+    background-color: #e6ee9c !important; 
+    color: #000 !important;
+}
+.bg-sanctification-custom { /* Heiligung (Rosé) */
+    background-color: #f8bbd0 !important;
+    color: #000 !important;
+}
+.bg-miracle-custom { /* Wunder (Goldgelb) */
+    background-color: #fff59d !important; 
+    color: #000 !important;
+}
+.bg-gods-work-custom { /* Gottes Wirken (Himmelblau) */
+    background-color: #81d4fa !important;
+    color: #000 !important;
+}
+.bg-law-custom { /* Gesetz (Schiefergrau) */
+    background-color: #b0bec5 !important;
+    color: #000 !important;
+}
+.bg-wisdom-custom { /* Weisheit/Lehre (Flieder) */
+    background-color: #c5cae9 !important;
+    color: #000 !important;
+}
+.bg-worship-custom { /* Anbetung/Lobpreis (Pfirsich) */
+    background-color: #ffccbc !important;
+    color: #000 !important;
+}
+.bg-covenant-custom { /* Bund (Weinrot-Hell) */
+    background-color: #ef9a9a !important; /* Ggf. anpassen, falls zu ähnlich zu Rot */
+    color: #000 !important;
+}
+
+/*
+=====================================================================================
+--- Globale Farbdefinitionen für Markierungen (Dunkelmodus) ---
+=====================================================================================
+*/
+body.dark-mode .bg-warning { 
+    background-color: #856404 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-green-custom { 
+    background-color: #155724 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-blue-custom { 
+    background-color: #004085 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-red-custom { 
+    background-color: #721c24 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-orange-custom { 
+    background-color: #b95000 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-brown-custom { 
+    background-color: #8b4513 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-gray-custom { 
+    background-color: #495057 !important; 
+    color: #e0e0e0 !important;      
+}
+body.dark-mode .bg-parable-custom { 
+    background-color: #00796b !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-rebuke-custom { 
+    background-color: #5e35b1 !important; 
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-name-custom { 
+    background-color: #556b2f !important; 
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-sanctification-custom { 
+    background-color: #c2185b !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-miracle-custom { 
+    background-color: #bba000 !important; 
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-gods-work-custom { 
+    background-color: #0277bd !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-law-custom { 
+    background-color: #37474f !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-wisdom-custom { 
+    background-color: #4527a0 !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-worship-custom { 
+    background-color: #d84315 !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .bg-covenant-custom { 
+    background-color: #880e4f !important;
+    color: #e0e0e0 !important;
+}
+
+
+/*
+========================================
+--- Dunkelmodus (Dark Mode) Allgemeine Styles ---
+========================================
+*/
+body.dark-mode {
+    background-color: #202020;
+    color: #e0e0e0;
+}
+body.dark-mode .card,
+body.dark-mode .bg-light { /* .bg-light wird im Dunkelmodus überschrieben */
+    background-color: #1e1e1e !important;
+    border-color: #444;
+    color: #e0e0e0;
+}
+body.dark-mode .list-group-item {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+body.dark-mode a {
+    color: #8ab4f8;
+}
+body.dark-mode .navbar.bg-dark { /* Stellt sicher, dass die Navbar dunkel bleibt */
+    background-color: #000 !important;
+}
+body.dark-mode .verse-num {
+    color: #aaa;
+}
+body.dark-mode .verse:hover {
+    background-color: #333;
+}
+body.dark-mode .modal-content {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    border-color: #444;
+}
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/*
+====================================================
+--- Popover Styling für Dunkelmodus (Dark Mode) ---
+====================================================
+*/
+body.dark-mode .popover {
+    background-color: #2a2a2a; 
+    border-color: #444; 
+}
+body.dark-mode .popover .popover-header {
+    background-color: #333; 
+    color: #e0e0e0; 
+    border-bottom-color: #444; 
+}
+body.dark-mode .popover .popover-body {
+    color: #e0e0e0; 
+}
+body.dark-mode .popover .list-group-item,
+body.dark-mode .popover .list-group-item-action {
+    background-color: #2a2a2a; 
+    color: #c0c0c0; 
+    border-color: #444; 
+}
+body.dark-mode .popover .list-group-item-action:hover,
+body.dark-mode .popover .list-group-item-action:focus {
+    background-color: #383838; 
+    color: #e0e0e0;
+}
+body.dark-mode .popover .dropdown-toggle.text-dark { /* Wichtig für den Link "Markieren mit Farbe" */
+    color: #c0c0c0 !important; 
+}
+body.dark-mode .popover .dropdown-menu {
+    background-color: #333; 
+    border-color: #555;
+}
+body.dark-mode .popover .dropdown-item {
+    color: #e0e0e0; 
+}
+body.dark-mode .popover .dropdown-item:hover,
+body.dark-mode .popover .dropdown-item:focus {
+    background-color: #454545; 
+    color: #fff;
+}
+
+/*
+====================================================
+--- Styling für "Für mich wichtig" Markierungen ---
+====================================================
+*/
+.user-important-star {
+    color: #ffc107; 
+    font-size: 0.8em; 
+    margin-right: 3px; 
+    vertical-align: super; 
+}
+body.dark-mode .user-important-star {
+    color: #f0ad4e; 
+}
+
+/* Spezifische Anpassungen für .verse, falls die Textfarbe anders sein soll als im Badge/Swatch */
+/* Beispiel:
+.verse.bg-green-custom { 
+    color: #0f5132 !important; // Dunkelgrüner Text auf hellgrünem Grund im Hellmodus
+}
+body.dark-mode .verse.bg-green-custom {
+    color: #75b798 !important; // Hellerer grüner Text auf dunkelgrünem Grund im Dunkelmodus
+}
+*/
+
+
+
+/* styles.css */
+.progress-bar-rank {
+    font-size: 0.70rem; /* Kleinere Schrift in der Progress-Bar, falls Sie Text anzeigen möchten */
+    line-height: 10px; /* Muss zur Höhe der Progress-Bar passen */
+    color: white; /* Textfarbe in der Progress-Bar */
+    /* background-color: #28a745 !important; */ /* Standard Bootstrap Success, kann überschrieben werden */
+}
+
+.rank-info {
+    font-size: 0.8rem;
+    /* Standardmäßig für helle Navbar, in .dark-mode .rank-info anpassen, falls nötig */
+}
+
+body.dark-mode .rank-info { /* Falls die Navbar-Textfarbe im Darkmode angepasst werden muss */
+    color: #adb5bd; /* Beispiel: Helleres Grau für Darkmode */
+}
+body.dark-mode .rank-info .progress {
+    background-color: #444; /* Dunklerer Hintergrund für die Progress-Leiste im Dark Mode */
+}
+body.dark-mode .rank-info .progress-bar {
+    background-color: #198754; /* Ggf. leicht angepasste Farbe für den Fortschrittsbalken */
+}
+
+/* Fügen Sie diesen Code in Ihren Dark-Mode-CSS-Block ein */
+
+body.dark-mode .text-muted {
+    color: #8ab4f8 !important; /* Ein sanftes, lesbares Blau für abgedunkelten Text */
+}

@@ -7,7 +7,8 @@
 // falls Sie später Logik hinzufügen, die eine Session oder DB-Verbindung benötigt.
 require_once 'config.php';
 
-header('Location: bibel_lesen.php');
+// index.php
+header('Location: welcome.php');
 exit();
 
 // Alternativ könnten Sie hier eine kleine Willkommensseite mit Links anzeigen:
