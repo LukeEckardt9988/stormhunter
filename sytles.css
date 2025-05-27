@@ -1,0 +1,107 @@
+/* style.css */
+body {
+    padding-top: 70px;
+    /* Platz für die fixe Navbar */
+}
+
+.verse-container {
+    line-height: 1.8;
+}
+
+.verse {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+    display: inline;
+    /* Wichtig für Popover-Positionierung */
+}
+
+.verse:hover {
+    background-color: #f0f0f0;
+}
+
+.verse-num {
+    font-size: 0.7em;
+    font-weight: bold;
+    color: #888;
+    vertical-align: super;
+    margin-right: 5px;
+}
+
+
+/* --- Markierungsfarben - Stellen Sie sicher, dass diese Klassen verwendet werden! --- */
+.verse.bg-warning {
+    /* Bootstrap-Standard für Gelb, kann hier überschrieben werden für Intensität */
+    background-color: #ffc107 !important;
+    /* Ein kräftigeres Gelb */
+    color: #000 !important;
+    /* Ggf. Textfarbe anpassen für Lesbarkeit */
+}
+
+.verse.bg-green-custom {
+    /* Eigener Name, um Konflikte zu vermeiden */
+    background-color: #90ee90 !important;
+    /* Helles, aber sattes Grün */
+    color: #000 !important;
+}
+
+.verse.bg-blue-custom {
+    background-color: #add8e6 !important;
+    /* Helles, sattes Blau */
+    color: #000 !important;
+}
+
+.verse.bg-red-custom {
+    background-color: #fa8072 !important;
+    /* Lachsrot / Koralle - intensiv */
+    color: #000 !important;
+}
+
+.verse.bg-orange-custom {
+    background-color: #ffa500 !important;
+    /* Reines Orange */
+    color: #000 !important;
+}
+
+.verse.bg-gray-custom {
+    background-color: #b0c4de !important;
+    /* Helleres Stahlblau/Grau */
+    color: #000 !important;
+}
+
+.verse.bg-purple-custom {
+    /* Für Königsherrschaft */
+    background-color: #dda0dd !important;
+    /* Pflaume / mittleres Lila */
+    color: #000 !important;
+}
+
+.verse.bg-brown-custom {
+    /* Für Geschichte */
+    background-color: #deb887 !important;
+    /* BurlyWood / helles Braun */
+    color: #000 !important;
+}
+
+.navbar {
+    margin-bottom: 1rem;
+    /* Sorgt für etwas Abstand unter der Navbar */
+}
+
+.popover {
+    max-width: 280px;
+    /* Breite des Popovers anpassen */
+}
+
+.popover .list-group-item {
+    padding: 0.5rem 1rem;
+    /* Kompakteres Popover-Menü */
+}
+
+.search-result-text strong {
+    /* Für suche.php */
+    background-color: yellow;
+    padding: 0 2px;
+    /* Etwas Abstand für die Hervorhebung */
+}
