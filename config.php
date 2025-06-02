@@ -11,10 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-/*  $host_name = 'db5017923462.hosting-data.io';
-  $database = 'dbs14268018';
-  $user_name = 'dbu5618344';
-  $password = '<Geben Sie hier Ihr Passwort ein.>';*/
+
 
 // Datenbank-Zugangsdaten
 define('DB_SERVER', 'localhost');
