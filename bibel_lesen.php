@@ -1,8 +1,66 @@
 <?php
-// config.php wird als Erstes geladen
-require_once 'config.php'; 
+require_once 'config.php'; // Stellt $pdo und die Session bereit (wichtig für $loggedInUserId)
+$loggedInUserId = $_SESSION['user_id'] ?? 0;
 
-$loggedInUserId = $_SESSION['user_id'] ?? 0; 
+// Prüfen, ob keine spezifischen Navigationsparameter (Buch, Kapitel, Version) in der URL übergeben wurden.
+// Wir leiten nur weiter, wenn ALLE drei fehlen, um Konflikte mit bestehenden Links zu vermeiden,
+// die vielleicht nur Buch und Kapitel, aber keine Version angeben (und dann auf Version 1 fallen).
+// Wenn Sie möchten, dass schon bei Fehlen von Buch & Kapitel weitergeleitet wird, passen Sie die Bedingung an.
+if (!isset($_GET['book_id']) && !isset($_GET['chapter']) && !isset($_GET['version_id'])) {
+    if ($loggedInUserId > 0) {
+        // Für eingeloggte Benutzer: Versuche, die letzte Position zu laden und weiterzuleiten.
+        // Dieser HTML-Block mit JavaScript wird nur ausgegeben, wenn keine Parameter da sind.
+        echo <<<HTML
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Letzte Leseposition wird geladen...</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const savedPositionRaw = localStorage.getItem('lastReadPosition_{$loggedInUserId}');
+                if (savedPositionRaw) {
+                    const savedPosition = JSON.parse(savedPositionRaw);
+                    if (savedPosition && savedPosition.book && savedPosition.chapter && savedPosition.version) {
+                        // Baue die neue URL zusammen
+                        const targetUrl = `bibel_lesen.php?version_id=\${savedPosition.version}&book_id=\${savedPosition.book}&chapter=\${savedPosition.chapter}`;
+                        window.location.replace(targetUrl); // .replace() verhindert Back-Button zum Ladebildschirm
+                        return; // Verhindere Fallback, falls Weiterleitung initiiert wurde
+                    }
+                }
+                // Fallback, wenn keine gültige Position gespeichert ist
+                window.location.replace('bibel_lesen.php?version_id=1&book_id=1&chapter=1');
+            } catch (e) {
+                console.error('Fehler beim Laden/Weiterleiten von localStorage:', e);
+                // Fallback bei JavaScript-Fehler
+                window.location.replace('bibel_lesen.php?version_id=1&book_id=1&chapter=1');
+            }
+        });
+    </script>
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=bibel_lesen.php?version_id=1&book_id=1&chapter=1" />
+        <p>JavaScript ist deaktiviert. Sie werden zu 1. Mose 1 weitergeleitet.</p>
+    </noscript>
+</head>
+<body>
+    <p style="text-align:center; padding-top:50px;">Letzte Leseposition wird geladen...</p>
+</body>
+</html>
+HTML;
+        exit; // Wichtig: Stoppt die weitere Ausführung von bibel_lesen.php für diesen Request.
+    } else {
+        // Für Gäste oder wenn $loggedInUserId nicht verfügbar ist:
+        // Setze Standardwerte, damit die Seite nicht mit Fehlern lädt.
+        // Die Seite wird dann mit diesen Standardwerten normal aufgebaut.
+        $_GET['version_id'] = 1;
+        $_GET['book_id'] = 1;
+        $_GET['chapter'] = 1;
+    }
+}
+
+// --- Ab hier beginnt Ihr normaler Code von bibel_lesen.php ---
+// $loggedInUserId = $_SESSION['user_id'] ?? 0; // Ist schon oben definiert
 $loggedInUsername = $_SESSION['username'] ?? 'Gast';
 
 $currentVersionId = isset($_GET['version_id']) ? (int)$_GET['version_id'] : 1;
@@ -185,6 +243,24 @@ require_once 'header.php';
     </form>
 </div>
 
+<button id="brush-mode-toggle" class="btn btn-outline-secondary" title="Pinsel-Modus umschalten">
+    <i class="bi bi-brush-fill"></i>
+</button>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="brushModeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto"><i class="bi bi-brush-fill"></i> Pinsel-Modus</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Aktiv! Jeder Klick auf einen Vers färbt ihn ein.
+    </div>
+  </div>
+</div>
+
+
+
 <h1 class="text-center mb-4"><?php echo htmlspecialchars((string)$currentBookName . ' ' . (string)$currentChapter); ?></h1>
 
 <div class="verse-container fs-5"> 
@@ -264,7 +340,43 @@ require_once 'header.php';
     </div></div>
 </div>
 
+<div class="modal fade" id="verseActionModal" tabindex="-1" aria-labelledby="verseActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verseActionModalLabel">Aktionen für...</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="verseActionModalBody">
+                </div>
+        </div>
+    </div>
+</div>
+
 
 <?php
+// Nur für eingeloggte Benutzer und wenn eine gültige Position angezeigt wird
+if ($loggedInUserId > 0 && isset($currentBookId) && $currentBookId > 0 && isset($currentChapter) && $currentChapter > 0 && isset($currentVersionId) && $currentVersionId > 0):
+?>
+<script>
+    try {
+        const lastReadPosition = {
+            book: <?php echo json_encode($currentBookId); ?>,
+            chapter: <?php echo json_encode($currentChapter); ?>,
+            version: <?php echo json_encode($currentVersionId); ?>
+        };
+        // Speichern unter einem Schlüssel, der die User-ID enthält
+        localStorage.setItem('lastReadPosition_<?php echo $loggedInUserId; ?>', JSON.stringify(lastReadPosition));
+        // console.log('Zuletzt gelesene Position gespeichert:', lastReadPosition);
+    } catch (e) {
+        console.error('Fehler beim Speichern der letzten Leseposition im localStorage:', e);
+    }
+</script>
+<?php
+endif;
 require_once 'footer.php'; 
 ?>
+
+
+
+

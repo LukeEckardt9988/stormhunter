@@ -1,64 +1,322 @@
-/* styles.css */
+/* ==========================================================================
+   1. Allgemeine Body- und HTML-Styles
+   ========================================================================== */
 body {
-    padding-top: 70px;
+    /* padding-top: für die fixed-top Navbar.
+       Der Wert (z.B. 56px oder 70px) hängt von der tatsächlichen Höhe Ihrer Navbar ab.
+       Ihr aktueller Wert ist 70px, was mehr Platz lässt. */
+    padding-top: 50px;
+    background-color: var(--bs-body-bg); /* Standard-Hintergrund von Bootstrap */
+    color: var(--bs-body-color);      /* Standard-Textfarbe von Bootstrap */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Sanfter Übergang für Theme-Wechsel */
 }
 
-/* Container für den Bibeltext */
+/* ==========================================================================
+   2. Navbar Styling
+   ========================================================================== */
+.navbar {
+    /* margin-bottom: 1rem; */ /* Normalerweise nicht nötig bei fixed-top */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Leichter Schatten für die Navbar */
+}
+
+.navbar-brand-logo {
+    height: 1.8em; /* Etwas größer für bessere Sichtbarkeit */
+    width: auto;
+    vertical-align: middle; /* Bessere Ausrichtung mit Text */
+}
+
+.navbar-brand {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Icon-basierte Navigation mit Text darunter (me-auto Teil) */
+.navbar-nav .nav-link {
+    padding-top: 0.4rem;
+    padding-bottom: 0.2rem;
+}
+
+.navbar-nav .nav-link .bi {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+    line-height: 1;
+    display: block;
+}
+
+.nav-link-text {
+    font-size: 0.65rem;
+    line-height: 1.1;
+    display: block;
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+}
+
+.navbar-nav .nav-link.active .nav-link-text {
+    font-weight: 500;
+}
+
+/* Rechte Navbar-Elemente (ms-auto Teil) - für saubere horizontale Ausrichtung */
+.navbar-nav.ms-auto {
+    align-items: center; /* Bootstrap Standard, hier zur Bestätigung */
+}
+
+.navbar-nav.ms-auto .nav-item { /* Gilt für alle <li> im rechten Teil */
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.navbar-nav.ms-auto .rank-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem 0.5rem; /* Etwas Padding für die Optik */
+    color: #f8f9fa; /* Heller Text auf dunkler Navbar */
+}
+
+.navbar-nav.ms-auto .rank-info .rank-title-sm {
+    font-size: 0.65rem; /* Kleinere Schrift */
+    line-height: 1;
+    font-weight: normal;
+}
+
+.navbar-nav.ms-auto .rank-info .rank-progress-sm {
+    height: 5px !important;
+    width: 80px !important; /* Etwas schmaler */
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+
+.navbar-nav.ms-auto .rank-info .next-rank-sm {
+    font-size: 0.55rem; /* Sehr klein */
+    line-height: 1;
+    color: #adb5bd;
+}
+
+.navbar-nav.ms-auto .nav-link,
+.navbar-nav.ms-auto .btn { /* Gilt für Theme-Button und User-Dropdown-Link */
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    display: flex; /* Hilft bei der Zentrierung von Icons im Button/Link */
+    align-items: center;
+}
+
+/* ==========================================================================
+   3. Progress-Container-Wrapper (unter der Navbar)
+   ========================================================================== */
+.progress-container-wrapper {
+    background-color: var(--bs-tertiary-bg); /* Hellerer Hintergrund im Light-Mode */
+    color: var(--bs-emphasis-color);      /* Dunklerer Text für guten Kontrast */
+    padding: 10px 0;
+    /* margin-top: 56px; Entfernt, da body.padding-top den Raum schafft */
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.progress-container-wrapper .rank-progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+}
+
+.progress-container-wrapper .rank-progress-info strong {
+    color: var(--bs-body-color); /* Standard-Textfarbe für hervorgehobenen Text */
+}
+
+.progress-container-wrapper .next-rank-display {
+    font-size: 0.75rem;
+    text-align: right;
+    margin-top: 3px;
+    color: var(--bs-secondary-color); /* Gedämpfte Farbe */
+}
+
+/* ==========================================================================
+   4. Hauptinhaltsbereiche
+   ========================================================================== */
+.main-content {
+    /* Der Abstand zum darüberliegenden Element (Navbar oder Progress-Container)
+       wird oft durch Bootstrap Margins (z.B. .mt-4 auf dem Container) oder
+       durch den Fluss des Dokuments nach dem body-padding-top geregelt.
+       Falls der .progress-container-wrapper immer da ist, wenn User eingeloggt: */
+}
+body:not(:has(.progress-container-wrapper)) .main-content {
+    /* Falls der Progress-Container fehlt (z.B. Gast), braucht der main-content
+       eventuell einen direkten Abstand zum (nicht sichtbaren) body-padding-top Bereich.
+       Dies ist komplexer und hängt davon ab, ob .progress-container-wrapper im PHP
+       immer einen Platzhalter einnimmt oder komplett fehlt.
+       Einfacher ist es, wenn der .main-content Container in PHP immer ein mt-4 hat. */
+}
+
 .verse-container {
-    line-height: 1.8; /* Sorgt für einen guten Zeilenabstand */
-    text-align: justify; /* Blocksatz für ein ruhigeres Schriftbild */
+    line-height: 1.8;
+    text-align: justify;
 }
 
-/* Versnummern-Styling */
 .verse-num {
     font-size: 0.7em;
     font-weight: bold;
-    color: #888;
+    color: #888; /* Wird im Dark Mode überschrieben */
     vertical-align: super;
-    margin-right: 2px; /* Reduzierter Abstand zum Text */
+    margin-right: 2px;
 }
 
-/* Vers-Text-Styling */
 .verse {
     cursor: pointer;
-    padding: 3px 2px; /* Etwas mehr vertikaler, weniger horizontaler Innenabstand */
+    padding: 3px 2px;
     border-radius: 4px;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s ease;
 }
 
 .verse:hover {
-    background-color: #e9ecef; /* Sanftes Grau beim Überfahren mit der Maus */
+    background-color: var(--bs-tertiary-bg-subtle); /* Sanfter Hover mit BS Variable */
 }
 
-/* --- Popover & Sonstiges --- */
-.navbar {
-    margin-bottom: 1rem;
+.user-important-star {
+    color: #ffc107;
+    font-size: 0.8em;
+    margin-right: 3px;
+    vertical-align: super;
 }
 
-.popover {
-    max-width: 280px;
+/* ==========================================================================
+   5. Komponenten-Styling
+   ========================================================================== */
+
+/* Farbauswahl im Modal (ehemals Popover-Color-Picker) */
+.popover-color-picker { /* Behalten wir den Klassennamen für Konsistenz */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    padding: 5px;
 }
 
-.popover .list-group-item {
-    padding: 0.5rem 1rem;
+.popover-color-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 75px;
 }
 
-/* Hervorhebung in den Suchergebnissen */
-.search-result-text strong {
-    background-color: #fff3cd; 
-    padding: 0 2px;
+.popover-color-item:hover {
+    background-color: var(--bs-secondary-bg-subtle);
 }
 
-/* Korrektur für die Farbanzeige auf der Markierungs-Seite (Legende) */
-.list-group-item .badge { /* Gilt für Badges innerhalb von Listenelementen, falls Sie das dort auch nutzen */
-    /* color: #000; */ /* Textfarbe wird durch die .bg-*-custom Klassen gesetzt */
-}
-.badge.bg-warning { /* Stellt sicher, dass Bootstrap Standard .bg-warning auch Textfarbe setzt, falls nötig */
-    color: #000 !important; 
+.popover-color-item .popover-color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 25%;
+    margin-bottom: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
 }
 
+.popover-color-item .popover-color-name {
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.3;
+    color: var(--bs-body-color); /* Passt sich Hell-/Dunkelmodus an */
+}
 
-/*
+.popover-color-item .remove-color-swatch {
+    background-color: var(--bs-tertiary-bg);
+    background-image: linear-gradient(135deg, #dc3545 45%, transparent 45%, transparent 55%, #dc3545 55%, #dc3545 60%, transparent 60%);
+    background-size: 8px 8px;
+}
+
+/* Highscore-Tabelle */
+.highscore-table {
+    /* Allgemeine Stile für die Highscore-Tabelle hier, falls nötig */
+}
+.highscore-table thead th {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-emphasis-color);
+    border-bottom-width: 2px;
+    white-space: nowrap;
+}
+.highscore-table tbody tr:nth-of-type(odd) {
+    background-color: var(--bs-secondary-bg-subtle);
+}
+.highscore-table tbody tr:hover {
+    background-color: var(--bs-primary-bg-subtle);
+}
+.highscore-table .badge {
+    min-width: 100px;
+    text-align: center;
+    font-size: 0.8rem; /* Badge Schriftgröße etwas angepasst */
+    padding: 0.3em 0.6em; /* Badge Padding */
+}
+.highscore-table tr.current-user-highlight {
+    background-color: var(--bs-info-bg-subtle) !important;
+    font-weight: bold;
+}
+.highscore-table tr.current-user-highlight td,
+.highscore-table tr.current-user-highlight th {
+    color: var(--bs-info-text-emphasis);
+}
+
+/* Status-Seite Kacheln */
+.book-status-compact-item {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out;
+    display: block;
+}
+.book-status-compact-item:hover {
+    background-color: var(--bs-tertiary-bg);
+    transform: translateY(-2px);
+}
+.book-status-compact-item .book-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.book-status-compact-item .book-stats {
+    font-size: 0.7rem;
+    color: var(--bs-secondary-color);
+}
+.book-status-compact-item .book-status-tiny-progress {
+    background-color: var(--bs-light-bg-subtle);
+    border-radius: var(--bs-progress-border-radius);
+}
+
+/* Pinsel-Modus Button */
+#brush-mode-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    z-index: 1030;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    padding: 0;
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-emphasis-color);
+    border: 1px solid var(--bs-border-color);
+}
+#brush-mode-toggle.btn-primary { /* Bootstrap Primary wird per JS gesetzt */
+    background-color: var(--bs-primary);
+    color: var(--bs-light); /* Oder spezifische Kontrastfarbe für Primary */
+    border-color: var(--bs-primary);
+}
+
+/* Toast-Benachrichtigungen */
+/* Standard Bootstrap Toasts sind meist ok, hier nur falls spezifische Overrides nötig */
+
+
+/* ==========================================================================
+   6. Globale Farbmarkierungs-Klassen (.bg-*-custom) - Hell-Modus
+   ========================================================================== */
 ============================================================
 --- Globale Farbdefinitionen für Markierungen (Hell-Modus) ---
 ============================================================
@@ -209,146 +467,275 @@ body.dark-mode .bg-covenant-custom {
 }
 
 
-/*
-========================================
---- Dunkelmodus (Dark Mode) Allgemeine Styles ---
-========================================
-*/
+
+
+/* ==========================================================================
+   7. Dark Mode
+   ========================================================================== */
 body.dark-mode {
-    background-color: #202020;
-    color: #e0e0e0;
+    background-color: #212529; /* Dunklerer Haupt-Hintergrund */
+    color: #dee2e6;        /* Hellere Standard-Schrift */
 }
+
 body.dark-mode .card,
-body.dark-mode .bg-light { /* .bg-light wird im Dunkelmodus überschrieben */
-    background-color: #1e1e1e !important;
-    border-color: #444;
-    color: #e0e0e0;
+body.dark-mode .bg-light { /* .bg-light ist oft ein Standard für helle Boxen */
+    background-color: #2c3034 !important; /* Dunklerer Kartenhintergrund */
+    border-color: #454d55;
+    color: #dee2e6;
 }
+
 body.dark-mode .list-group-item {
-    background-color: #1e1e1e;
-    border-color: #444;
-    color: #e0e0e0;
+    background-color: #2c3034;
+    border-color: #454d55;
+    color: #dee2e6;
 }
+
 body.dark-mode a {
-    color: #8ab4f8;
+    color: #8ab4f8; /* Helleres Blau für Links */
 }
-body.dark-mode .navbar.bg-dark { /* Stellt sicher, dass die Navbar dunkel bleibt */
-    background-color: #000 !important;
+body.dark-mode a:hover {
+    color: #a9c7f5;
 }
+
+body.dark-mode .navbar.bg-dark { /* Ihre Navbar ist navbar-dark bg-dark */
+    background-color: #1a1a1a !important; /* Sehr dunkel für die Navbar */
+    border-bottom: 1px solid #333;
+}
+body.dark-mode .navbar-brand,
+body.dark-mode .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+}
+body.dark-mode .navbar-nav .nav-link:hover,
+body.dark-mode .navbar-nav .nav-link.active {
+    color: #fff;
+}
+body.dark-mode .navbar-nav.ms-auto .rank-info {
+    color: #adb5bd;
+}
+body.dark-mode .navbar-nav.ms-auto .rank-info .next-rank-sm {
+    color: #868e96;
+}
+body.dark-mode .navbar-nav.ms-auto .rank-info .progress {
+    background-color: #444;
+}
+
+body.dark-mode .progress-container-wrapper {
+    background-color: #212529;
+    color: #dee2e6;
+    border-bottom: 1px solid #373b3e;
+}
+body.dark-mode .progress-container-wrapper .rank-progress-info strong {
+    color: #f8f9fa;
+}
+body.dark-mode .progress-container-wrapper .next-rank-display {
+    color: var(--bs-gray-600); /* Bootstrap Variable für dunkles Grau */
+}
+
 body.dark-mode .verse-num {
-    color: #aaa;
+    color: #999; /* Helleres Grau für Versnummern */
 }
 body.dark-mode .verse:hover {
-    background-color: #333;
+    background-color: #303030; /* Dunklerer Hover für Verse */
 }
+body.dark-mode .user-important-star {
+    color: #f0ad4e;
+}
+
 body.dark-mode .modal-content {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
+    background-color: #2c3034; /* Konsistenter dunkler Hintergrund für Modals */
+    color: #dee2e6;
 }
 body.dark-mode .modal-header,
 body.dark-mode .modal-footer {
-    border-color: #444;
+    border-color: #454d55;
 }
 body.dark-mode .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
+    filter: invert(1) grayscale(100%) brightness(150%); /* Hellerer Schließen-Button */
 }
 
-/*
-====================================================
---- Popover Styling für Dunkelmodus (Dark Mode) ---
-====================================================
-*/
-body.dark-mode .popover {
-    background-color: #2a2a2a; 
-    border-color: #444; 
+/* Farbauswahl im Modal - Dark Mode */
+body.dark-mode .popover-color-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
-body.dark-mode .popover .popover-header {
-    background-color: #333; 
-    color: #e0e0e0; 
-    border-bottom-color: #444; 
-}
-body.dark-mode .popover .popover-body {
-    color: #e0e0e0; 
-}
-body.dark-mode .popover .list-group-item,
-body.dark-mode .popover .list-group-item-action {
-    background-color: #2a2a2a; 
-    color: #c0c0c0; 
-    border-color: #444; 
-}
-body.dark-mode .popover .list-group-item-action:hover,
-body.dark-mode .popover .list-group-item-action:focus {
-    background-color: #383838; 
+body.dark-mode .popover-color-item .popover-color-name {
     color: #e0e0e0;
 }
-body.dark-mode .popover .dropdown-toggle.text-dark { /* Wichtig für den Link "Markieren mit Farbe" */
-    color: #c0c0c0 !important; 
+body.dark-mode .popover-color-item .remove-color-swatch {
+    background-color: #495057;
 }
-body.dark-mode .popover .dropdown-menu {
-    background-color: #333; 
-    border-color: #555;
+
+/* Highscore Tabelle - Dark Mode */
+body.dark-mode .highscore-table {
+    --bs-table-color: #dee2e6;
+    --bs-table-border-color: #373b3e;
+    --bs-table-striped-bg: #2c3034;
+    --bs-table-bg: #272b2f;
+    --bs-table-hover-bg: #343a40;
+    --bs-table-hover-color: #ffffff;
 }
-body.dark-mode .popover .dropdown-item {
-    color: #e0e0e0; 
+body.dark-mode .highscore-table thead th {
+    background-color: #212529 !important;
+    color: #f0f0f0 !important;
+    border-color: #373b3e !important;
 }
-body.dark-mode .popover .dropdown-item:hover,
-body.dark-mode .popover .dropdown-item:focus {
-    background-color: #454545; 
+body.dark-mode .highscore-table td,
+body.dark-mode .highscore-table th {
+    color: #dee2e6 !important; /* Stellt sicher, dass aller Text hell ist */
+}
+body.dark-mode .highscore-table tr.current-user-highlight {
+    background-color: #033c73 !important;
+}
+body.dark-mode .highscore-table tr.current-user-highlight td,
+body.dark-mode .highscore-table tr.current-user-highlight th {
+    color: #afeeff !important;
+}
+body.dark-mode .highscore-table .bi-person-circle { color: #adb5bd !important; }
+body.dark-mode .highscore-table .bi-trophy-fill.text-warning { color: #ffc107 !important; }
+body.dark-mode .highscore-table .bi-trophy-fill.text-secondary { color: #b0b0b0 !important; }
+body.dark-mode .highscore-table .bi-trophy-fill.text-danger-emphasis { color: #d98f54 !important; }
+
+body.dark-mode .highscore-table .badge.bg-light {
+    background-color: #495057 !important;
+    color: #f8f9fa !important;
+}
+body.dark-mode .highscore-table .badge.bg-secondary { /* Bootstrap .bg-secondary ist im Dark Mode oft schon gut */
+    background-color: #5a6268 !important; /* Beispiel, falls nötig */
+    color: #fff !important;
+}
+/* Weitere .bg-* Badge Anpassungen für Dark Mode hier, falls Ihre globalen Regeln nicht ausreichen */
+
+
+/* Status Seite Kacheln - Dark Mode */
+body.dark-mode .book-status-compact-item {
+    background-color: #2c3034;
+    color: #dee2e6;
+    border-color: #454d55 !important;
+}
+body.dark-mode .book-status-compact-item:hover {
+    background-color: #343a40;
+}
+body.dark-mode .book-status-compact-item .book-name {
+    color: #f8f9fa;
+}
+body.dark-mode .book-status-compact-item .book-stats {
+    color: #adb5bd;
+}
+body.dark-mode .book-status-compact-item .book-status-tiny-progress {
+    background-color: #212529;
+}
+
+/* Pinsel-Modus Button - Dark Mode */
+body.dark-mode #brush-mode-toggle {
+    background-color: #495057;
+    color: #f8f9fa;
+    border-color: #343a40;
+}
+body.dark-mode #brush-mode-toggle.btn-primary { /* Aktiver Zustand */
+    background-color: var(--bs-primary); /* Nutzt Bootstrap's Primary */
     color: #fff;
+    border-color: var(--bs-primary);
 }
 
-/*
-====================================================
---- Styling für "Für mich wichtig" Markierungen ---
-====================================================
-*/
-.user-important-star {
-    color: #ffc107; 
-    font-size: 0.8em; 
-    margin-right: 3px; 
-    vertical-align: super; 
+/* Toast - Dark Mode */
+body.dark-mode .toast {
+    background-color: #2c3034; /* Toast Hintergrund */
+    color: #dee2e6;          /* Toast Text */
+    border-color: #454d55;
 }
-body.dark-mode .user-important-star {
-    color: #f0ad4e; 
+body.dark-mode .toast-header {
+    background-color: #343a40; /* Header des Toasts */
+    color: #f8f9fa;
+    border-bottom-color: #454d55;
+}
+body.dark-mode .toast-header .btn-close { /* Schließen-Button im Toast */
+    filter: invert(1) grayscale(100%) brightness(150%);
+}
+body.dark-mode .toast-body {
+    /* Textfarbe wird von .toast geerbt, Hintergrund auch, außer bei spezifischem Styling */
 }
 
-/* Spezifische Anpassungen für .verse, falls die Textfarbe anders sein soll als im Badge/Swatch */
-/* Beispiel:
-.verse.bg-green-custom { 
-    color: #0f5132 !important; // Dunkelgrüner Text auf hellgrünem Grund im Hellmodus
-}
-body.dark-mode .verse.bg-green-custom {
-    color: #75b798 !important; // Hellerer grüner Text auf dunkelgrünem Grund im Dunkelmodus
-}
-*/
+/* Globale Farbmarkierungs-Klassen (.bg-*-custom) - Dark Mode */
+/* Ihre .bg-*-custom Dark Mode Definitionen von oben hier einfügen, z.B.: */
+body.dark-mode .bg-warning { background-color: #856404 !important; color: #e0e0e0 !important; }
+body.dark-mode .bg-green-custom { background-color: #155724 !important; color: #e0e0e0 !important; }
+/* ... ALLE ANDEREN FARBEN ... */
+body.dark-mode .bg-covenant-custom { background-color: #880e4f !important; color: #e0e0e0 !important; }
 
+
+/* ==========================================================================
+   8. Media Queries (spezifisch für mobile Navbar, falls noch nicht global abgedeckt)
+   ========================================================================== */
+@media (max-width: 991.98px) { /* Bootstrap lg breakpoint für eingeklappte Navbar */
+    .navbar-collapse ul.navbar-nav.me-auto {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 0.5rem;
+    }
+    .navbar-collapse ul.navbar-nav.me-auto .nav-item {
+        margin: 5px;
+    }
+    .navbar-collapse ul.navbar-nav.me-auto .nav-link {
+        padding: 0.3rem 0.4rem;
+    }
+    .navbar-collapse ul.navbar-nav.me-auto .nav-link .bi {
+        font-size: 1.3rem;
+        margin-bottom: 1px;
+    }
+    .navbar-collapse ul.navbar-nav.me-auto .nav-link .nav-link-text {
+        font-size: 0.55rem;
+        line-height: 1;
+    }
+
+    /* Rechte Elemente in der mobilen Navbar (Theme, User) untereinander zentrieren */
+    .navbar-collapse ul.navbar-nav.ms-auto {
+        width: 100%;
+        align-items: center; /* Zentriert die Listenelemente selbst */
+    }
+    .navbar-collapse ul.navbar-nav.ms-auto .nav-item {
+        width: auto; /* Erlaubt den Elementen, ihre natürliche Breite einzunehmen */
+        margin-top: 0.5rem;
+    }
+    .navbar-collapse ul.navbar-nav.ms-auto .dropdown-menu {
+        /* Stellt sicher, dass das Dropdown im mobilen Menü korrekt positioniert ist */
+        position: static !important; /* Verhindert absolute Positionierung */
+        float: none !important;
+        width: auto !important;
+        margin-top: 0 !important;
+        background-color: transparent !important; /* Hintergrund der Navbar nutzen */
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+    .navbar-collapse ul.navbar-nav.ms-auto .dropdown-menu .dropdown-item {
+        padding-left: 1rem; /* Einrücken für bessere Lesbarkeit */
+        color: rgba(255, 255, 255, 0.85); /* Farbe anpassen */
+    }
+    body.dark-mode .navbar-collapse ul.navbar-nav.ms-auto .dropdown-menu .dropdown-item {
+        color: rgba(255, 255, 255, 0.85);
+    }
+    body.dark-mode .navbar-collapse ul.navbar-nav.ms-auto .dropdown-menu .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+}
+
+/* Hilfsklasse für Text, der nur für Screenreader sichtbar sein soll */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 
 /* styles.css */
-.progress-bar-rank {
-    font-size: 0.70rem; /* Kleinere Schrift in der Progress-Bar, falls Sie Text anzeigen möchten */
-    line-height: 10px; /* Muss zur Höhe der Progress-Bar passen */
-    color: white; /* Textfarbe in der Progress-Bar */
-    /* background-color: #28a745 !important; */ /* Standard Bootstrap Success, kann überschrieben werden */
-}
-
-.rank-info {
-    font-size: 0.8rem;
-    /* Standardmäßig für helle Navbar, in .dark-mode .rank-info anpassen, falls nötig */
-}
-
-body.dark-mode .rank-info { /* Falls die Navbar-Textfarbe im Darkmode angepasst werden muss */
-    color: #adb5bd; /* Beispiel: Helleres Grau für Darkmode */
-}
-body.dark-mode .rank-info .progress {
-    background-color: #444; /* Dunklerer Hintergrund für die Progress-Leiste im Dark Mode */
-}
-body.dark-mode .rank-info .progress-bar {
-    background-color: #198754; /* Ggf. leicht angepasste Farbe für den Fortschrittsbalken */
-}
-
-/* Fügen Sie diesen Code in Ihren Dark-Mode-CSS-Block ein */
-
 body.dark-mode .text-muted {
-    color: #8ab4f8 !important; /* Ein sanftes, lesbares Blau für abgedunkelten Text */
+    color: #8ab4f8 !important; /* Sanftes Hellblau für gedämpften Text */
 }

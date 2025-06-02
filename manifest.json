@@ -1,0 +1,21 @@
+{
+  "name": "Bibel-App",
+  "short_name": "Ohael Bibel-App",
+  "start_url": "/index.php",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8ab4f8",
+  "description": "Eine App zum Studieren und Lesen der Bibel.",
+  "icons": [
+    {
+      "src": "/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

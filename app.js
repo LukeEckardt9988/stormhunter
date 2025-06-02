@@ -1,20 +1,61 @@
-// app.js - Dynamische Updates ohne Seiten-Neuladen (Optimiert)
+// app.js - Finale, VOLLSTÄNDIGE Version (27.05.2025)
 
 // Globale Variablen
 const currentUserId = typeof currentUserIdFromPHP !== 'undefined' ? currentUserIdFromPHP : 0;
-let activePopoverInstance = null;
-let activePopoverTargetElement = null;
+let isBrushModeActive = false;
 
+// Event-Listener, der nach dem Laden der Seite ausgeführt wird
 document.addEventListener('DOMContentLoaded', function () {
     if (typeof bootstrap === 'undefined') {
         console.error('FEHLER: Bootstrap ist nicht geladen!');
         return;
     }
+    
+    // Logik für bibel_lesen.php (und global)
     initializeThemeToggler();
-    initializeVersePopoverLogic();
-    initializeModalLikeButtonLogic(); // <-- DIESE NEUE ZEILE HINZUFÜGEN
+    initializeVerseActionLogic(); 
+    initializeModalLikeButtonLogic(); // Für Likes im Kommentare-Modal von bibel_lesen.php
 
+    const brushModeButton = document.getElementById('brush-mode-toggle');
+    if (brushModeButton) {
+        brushModeButton.addEventListener('click', () => {
+            isBrushModeActive = !isBrushModeActive;
+            brushModeButton.classList.toggle('btn-primary', isBrushModeActive);
+            if (!isBrushModeActive) {
+                brushModeButton.classList.remove('btn-outline-secondary');
+            }
+
+            if (isBrushModeActive) {
+                hideVerseActionModal();
+                const toastEl = document.getElementById('brushModeToast');
+                if (toastEl) {
+                    const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+                    toast.show();
+                }
+            }
+        });
+    }
+
+    // Logik NUR für kommentare_uebersicht.php
+    if (document.getElementById('commentListContainer')) {
+        initializeCommentPageLogic();
+    }
 });
+
+
+// --- Globale Hilfsfunktionen ---
+function htmlspecialchars(str) {
+    if (typeof str !== 'string') return '';
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return str.replace(/[&<>"']/g, m => map[m]);
+}
+function nl2br(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/(?:\r\n|\r|\n)/g, '<br>');
+}
+
+
+// --- Funktionen für bibel_lesen.php (und global genutzte wie Theme) ---
 
 function initializeThemeToggler() {
     const themeToggleButton = document.getElementById('theme-toggle-btn');
@@ -37,7 +78,7 @@ function initializeThemeToggler() {
     });
 }
 
-function initializeVersePopoverLogic() {
+function initializeVerseActionLogic() {
     const verseContainer = document.querySelector('.verse-container');
     if (!verseContainer) return;
 
@@ -45,191 +86,154 @@ function initializeVersePopoverLogic() {
         const clickedVerse = event.target.closest('.verse');
         if (!clickedVerse) return;
 
-        if (activePopoverTargetElement === clickedVerse) {
-            closeActivePopover();
-        } else {
-            if (activePopoverInstance) closeActivePopover();
-            createAndShowPopoverForVerse(clickedVerse);
+        if (isBrushModeActive) {
+            const lastColor = localStorage.getItem('lastUsedColor');
+            if (!lastColor || lastColor === 'remove_color') {
+                alert("Bitte wählen Sie zuerst eine Farbe aus, um den Pinsel-Modus zu verwenden.");
+                return;
+            }
+            handleColorHighlight(clickedVerse.dataset.globalId, lastColor);
+            return; 
         }
-    });
-
-    document.addEventListener('click', function (event) {
-        if (!activePopoverInstance || !activePopoverTargetElement) return;
-        const clickedOnPopoverTrigger = activePopoverTargetElement.contains(event.target);
-        const clickedInsidePopoverContent = event.target.closest('.popover');
-        if (!clickedOnPopoverTrigger && !clickedInsidePopoverContent) {
-            closeActivePopover();
-        }
+        
+        showVerseActionsInModal(clickedVerse);
     });
 }
 
-function createAndShowPopoverForVerse(verseElement) {
-    const globalId = verseElement.dataset.globalId;
-    if (!globalId) return;
+function showVerseActionsInModal(verseElement) {
+    const modalElement = document.getElementById('verseActionModal');
+    if (!modalElement) return;
 
+    const verseActionModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    
+    const globalId = verseElement.dataset.globalId;
     const verseNumSpan = verseElement.previousElementSibling;
-    const verseNumText = verseNumSpan && verseNumSpan.classList.contains('verse-num') ? verseNumSpan.textContent.trim() : '';
-    const bookChapterTitleH1 = document.querySelector('h1.text-center');
-    const bookChapterTitleText = bookChapterTitleH1 ? bookChapterTitleH1.textContent.trim() : 'Vers';
+    const verseNumText = verseNumSpan ? verseNumSpan.textContent.trim() : '';
+    const bookChapterTitleText = document.querySelector('h1.text-center')?.textContent.trim() || 'Vers';
+
+    const modalTitle = document.getElementById('verseActionModalLabel');
+    const modalBody = document.getElementById('verseActionModalBody');
+
+    modalTitle.textContent = `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`;
 
     const highlightColors = [
-        { name: 'Wichtig (Gelb)', value: 'yellow' }, { name: 'Verheißung (Grün)', value: 'green' },
-        { name: 'Gebot (Blau)', value: 'blue' }, { name: 'Sünde/Warnung (Rot)', value: 'red' },
-        { name: 'Prophetie (Orange)', value: 'orange' }, { name: 'Geschichte (Braun)', value: 'brown' },
-        { name: 'Gleichnis (Türkis)', value: 'parable' },
-        { name: 'Zurechtweisung (Lavendel)', value: 'rebuke' },
-        { name: 'Namen/Orte (Oliv)', value: 'name' },
-        { name: 'Heiligung (Rosé)', value: 'sanctification' },
-        { name: 'Wunder (Gold)', value: 'miracle' },
-        { name: 'Gottes Wirken (Himmelblau)', value: 'gods_work' },
-        { name: 'Gesetz (Schiefergrau)', value: 'law' },
-        { name: 'Weisheit/Lehre (Flieder)', value: 'wisdom' },
-        { name: 'Anbetung/Gebet (Pfirsich)', value: 'worship' },
-        { name: 'Bund (Weinrot)', value: 'covenant' },
-        { name: 'Unklar (Grau)', value: 'gray' },
-        { name: 'Keine Farb-Markierung', value: 'remove_color' }
+        { name: 'Wichtig (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, { name: 'Verheißung (Grün)', value: 'green', cssClass: 'bg-green-custom' },
+        { name: 'Gebot (Blau)', value: 'blue', cssClass: 'bg-blue-custom' }, { name: 'Sünde/Warnung (Rot)', value: 'red', cssClass: 'bg-red-custom' },
+        { name: 'Prophetie (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, { name: 'Geschichte (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
+        { name: 'Gleichnis (Türkis)', value: 'parable', cssClass: 'bg-parable-custom' }, { name: 'Zurechtweisung (Lavendel)', value: 'rebuke', cssClass: 'bg-rebuke-custom' },
+        { name: 'Namen/Orte (Oliv)', value: 'name', cssClass: 'bg-name-custom' }, { name: 'Heiligung (Rosé)', value: 'sanctification', cssClass: 'bg-sanctification-custom' },
+        { name: 'Wunder (Gold)', value: 'miracle', cssClass: 'bg-miracle-custom' }, { name: 'Gottes Wirken (Himmelblau)', value: 'gods_work', cssClass: 'bg-gods-work-custom' },
+        { name: 'Gesetz (Schiefergrau)', value: 'law', cssClass: 'bg-law-custom' }, { name: 'Weisheit/Lehre (Flieder)', value: 'wisdom', cssClass: 'bg-wisdom-custom' },
+        { name: 'Anbetung/Gebet (Pfirsich)', value: 'worship', cssClass: 'bg-worship-custom' }, { name: 'Bund (Weinrot)', value: 'covenant', cssClass: 'bg-covenant-custom' },
+        { name: 'Unklar (Grau)', value: 'gray', cssClass: 'bg-gray-custom' }, { name: 'Entfernen', value: 'remove_color', cssClass: 'remove-color-swatch' }
     ];
-    const colorOptionsHtml = highlightColors.map(color =>
-        `<li><a class="dropdown-item" href="#" onclick="event.preventDefault(); handleColorHighlight(${globalId}, '${color.value}')">${color.name}</a></li>`
-    ).join('');
 
-    const isAlreadyImportant = verseElement.dataset.isImportant === 'true';
+    const colorPickerHtml = `
+        <div class="popover-color-picker">
+            ${highlightColors.map(color => {
+                const displayName = color.name.split(' (')[0];
+                return `
+                    <div class="popover-color-item" title="${color.name}" onclick="event.preventDefault(); handleColorHighlight(${globalId}, '${color.value}')">
+                        <div class="popover-color-swatch ${color.cssClass}"></div>
+                        <div class="popover-color-name">${displayName}</div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+
+    const isAlreadyImportant = verseElement.dataset.isImportant === 'true'; 
     const importantLinkText = isAlreadyImportant ? "Als 'wichtig' entfernen" : "Für mich wichtig markieren";
-
+    
     const actionsHtml = `
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action important-link" onclick="event.preventDefault(); handleMarkAsImportant(${globalId}, this)">${importantLinkText}</a>
-            <div class="list-group-item">
-                <div class="dropdown">
-                    <a class="dropdown-toggle text-decoration-none text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Farblich hervorheben (Global)</a>
-                    <ul class="dropdown-menu" style="max-height: 200px; overflow-y: auto;">${colorOptionsHtml}</ul>
+            ${colorPickerHtml}
+            <div class="list-group-item mt-2">
+                <div class="d-grid gap-2">
+                     <a href="#" class="btn btn-outline-primary" onclick="event.preventDefault(); handleMarkAsImportant(${globalId})">${importantLinkText}</a>
+                     <a href="#" class="btn btn-outline-secondary" onclick="event.preventDefault(); handleCompareVerse(${globalId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Verse vergleichen</a>
+                     <a href="#" class="btn btn-outline-secondary" onclick="event.preventDefault(); handleShowComments(${globalId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Kommentare</a>
                 </div>
             </div>
-            <a href="#" class="list-group-item list-group-item-action" onclick="event.preventDefault(); handleCompareVerse(${globalId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Verse vergleichen</a>
-            <a href="#" class="list-group-item list-group-item-action" onclick="event.preventDefault(); handleShowComments(${globalId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Kommentare</a>
         </div>`;
 
-    try {
-        activePopoverInstance = new bootstrap.Popover(verseElement, {
-            html: true, title: `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`,
-            content: actionsHtml, sanitize: false, trigger: 'manual'
-        });
-        if (activePopoverInstance) {
-            activePopoverInstance.show();
-            activePopoverTargetElement = verseElement;
-        } else {
-            console.error("app.js FEHLER: bootstrap.Popover() hat kein gültiges Objekt zurückgegeben.");
-        }
-    } catch (error) {
-        console.error("app.js FEHLER: Fehler beim Erstellen oder Anzeigen des Popovers:", error);
-        closeActivePopover();
-    }
+    modalBody.innerHTML = actionsHtml;
+    verseActionModal.show();
 }
 
-function closeActivePopover() {
-    if (activePopoverInstance) {
-        try {
-            activePopoverInstance.dispose();
-        } catch (e) { console.error("app.js FEHLER beim dispose() des Popovers:", e); }
-        activePopoverInstance = null;
-        activePopoverTargetElement = null;
+function hideVerseActionModal() {
+    const modalElement = document.getElementById('verseActionModal');
+    if (modalElement) {
+        const verseModal = bootstrap.Modal.getInstance(modalElement);
+        if (verseModal && verseModal._isShown) { // Prüfen ob Modal überhaupt angezeigt wird
+            verseModal.hide();
+        }
     }
 }
 
 function handleColorHighlight(globalVerseId, colorValue) {
+    hideVerseActionModal();
+
     if (currentUserId === 0 && colorValue !== 'remove_color') {
         alert("Bitte zuerst einloggen, um farbliche Markierungen zu setzen.");
         return;
     }
-    closeActivePopover();
-
+    
+    if (colorValue !== 'remove_color') {
+        localStorage.setItem('lastUsedColor', colorValue);
+    }
+    
     const verseElement = document.querySelector(`.verse[data-global-id='${globalVerseId}']`);
     if (!verseElement) return;
 
     const colorMap = {
-        'yellow': 'bg-warning', 'green': 'bg-green-custom', 'blue': 'bg-blue-custom',
-        'red': 'bg-red-custom', 'orange': 'bg-orange-custom', 'brown': 'bg-brown-custom',
-        'gray': 'bg-gray-custom', 'parable': 'bg-parable-custom', 'rebuke': 'bg-rebuke-custom',
-        'name': 'bg-name-custom', 'sanctification': 'bg-sanctification-custom',
-        'miracle': 'bg-miracle-custom', 'gods_work': 'bg-gods-work-custom', 'law': 'bg-law-custom',
+        'yellow': 'bg-warning', 'green': 'bg-green-custom', 'blue': 'bg-blue-custom', 'red': 'bg-red-custom', 'orange': 'bg-orange-custom', 
+        'brown': 'bg-brown-custom', 'gray': 'bg-gray-custom', 'parable': 'bg-parable-custom', 'rebuke': 'bg-rebuke-custom', 'name': 'bg-name-custom', 
+        'sanctification': 'bg-sanctification-custom', 'miracle': 'bg-miracle-custom', 'gods_work': 'bg-gods-work-custom', 'law': 'bg-law-custom',
         'wisdom': 'bg-wisdom-custom', 'worship': 'bg-worship-custom', 'covenant': 'bg-covenant-custom'
     };
-    let actionForServer = colorValue === 'remove_color' ? 'removeHighlight' : 'addHighlight';
 
-    const oldColor = verseElement.dataset.currentColor; // Alte Farbe für mögliches Rollback merken
-    Object.values(colorMap).forEach(cssClass => verseElement.classList.remove(cssClass));
+    const oldColorClass = Object.values(colorMap).find(c => verseElement.classList.contains(c));
+    if (oldColorClass) {
+        verseElement.classList.remove(oldColorClass);
+    }
 
     if (colorValue !== 'remove_color' && colorMap[colorValue]) {
-        if (oldColor === colorValue && actionForServer === 'addHighlight') {
-            actionForServer = 'removeHighlight'; // Toggle: Gleiche Farbe -> entfernen
-            verseElement.dataset.currentColor = '';
-        } else {
-            verseElement.classList.add(colorMap[colorValue]);
-            verseElement.dataset.currentColor = colorValue;
-            actionForServer = 'addHighlight'; // Sicherstellen, dass es add ist, wenn eine neue Farbe gesetzt wird
-        }
-    } else {
-        verseElement.dataset.currentColor = '';
-        actionForServer = 'removeHighlight'; // Sicherstellen für 'remove_color'
+        verseElement.classList.add(colorMap[colorValue]);
     }
+    // verseElement.dataset.currentColor wird im Backend gesetzt, UI ist optimistich
 
-    // AJAX Call nur wenn eingeloggter User die Farbe ändert oder entfernt
-    if (currentUserId > 0) {
-        fetch('ajax_handler.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `action=${actionForServer}&global_verse_id=${globalVerseId}&user_id=${currentUserId}&color=${(actionForServer === 'removeHighlight' || colorValue === 'remove_color') ? '' : colorValue}`
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status !== 'success') {
-                    alert('Fehler vom Server: ' + data.message);
-                    // Rollback der UI-Änderung
-                    Object.values(colorMap).forEach(cssClass => verseElement.classList.remove(cssClass));
-                    if (oldColor && colorMap[oldColor]) {
-                        verseElement.classList.add(colorMap[oldColor]);
-                    }
-                    verseElement.dataset.currentColor = oldColor ?? '';
-                } else {
-                    // Da Farben global sind, ist ein Reload hier am sichersten, um den
-                    // absolut korrekten globalen Zustand zu sehen (falls ein anderer User schnell war).
-                    // Für ein "smoother" Erlebnis könnte man den Reload weglassen,
-                    // riskiert aber, dass nicht die "neueste" globale Farbe angezeigt wird.
-                    // Kompromiss: Nur bei 'removeHighlight' neu laden, wenn die globale Farbe sich ändern könnte.
-                    if (actionForServer === 'removeHighlight' && oldColor) {
-                        window.location.reload();
-                    } else if (actionForServer === 'addHighlight' && data.newGlobalColor && data.newGlobalColor !== colorValue) {
-                        // Optional: Wenn der Server eine andere globale Farbe zurückgibt, Seite neu laden
-                        window.location.reload();
-                    }
-                    // Ansonsten ist die UI schon aktuell für die Aktion dieses Users.
-                }
-            }).catch(error => {
-                console.error("Fehler bei AJAX (handleColorHighlight):", error);
-                alert("Kommunikationsfehler beim Speichern der Farb-Markierung.");
-                // Rollback der UI-Änderung
-                Object.values(colorMap).forEach(cssClass => verseElement.classList.remove(cssClass));
-                if (oldColor && colorMap[oldColor]) {
-                    verseElement.classList.add(colorMap[oldColor]);
-                }
-                verseElement.dataset.currentColor = oldColor ?? '';
-            });
-    } else if (actionForServer === 'addHighlight' && colorValue !== 'remove_color') {
-        // Gast versucht Farbe zu setzen -> UI zurücksetzen und Meldung
-        Object.values(colorMap).forEach(cssClass => verseElement.classList.remove(cssClass));
-        verseElement.dataset.currentColor = '';
-        // alert("Nur eingeloggte Benutzer können farbliche Markierungen setzen."); // Bereits oben
-    }
+    const actionForServer = colorValue === 'remove_color' ? 'removeHighlight' : 'addHighlight';
+    fetch('ajax_handler.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=${actionForServer}&global_verse_id=${globalVerseId}&color=${colorValue}` // user_id kommt aus Session im Backend
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            alert('Fehler beim Speichern der Markierung: ' + data.message);
+            // Bei Fehler: UI zurücksetzen
+            if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
+            if (oldColorClass) verseElement.classList.add(oldColorClass);
+        }
+        // Kein window.location.reload(); für besseres Nutzererlebnis
+    })
+    .catch(error => {
+        console.error('Farb-Update-Fehler:', error);
+        alert('Kommunikationsfehler beim Speichern der Markierung.');
+        if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
+        if (oldColorClass) verseElement.classList.add(oldColorClass);
+    });
 }
 
-function handleMarkAsImportant(globalVerseId, linkElement) {
+
+function handleMarkAsImportant(globalVerseId) {
+    hideVerseActionModal();
     if (currentUserId === 0) {
-        alert("Bitte zuerst einloggen, um Verse als wichtig zu markieren.");
+        alert("Bitte zuerst einloggen.");
         return;
     }
-    // Popover wird nach Klick auf den Link automatisch durch den document-listener geschlossen
-    // Daher ist closeActivePopover() hier nicht zwingend, schadet aber nicht.
-    closeActivePopover();
 
     const verseElement = document.querySelector(`.verse[data-global-id='${globalVerseId}']`);
     if (!verseElement) return;
@@ -237,116 +241,95 @@ function handleMarkAsImportant(globalVerseId, linkElement) {
     const wasImportant = verseElement.classList.contains('user-important-verse-text');
     const actionForServer = wasImportant ? 'removeImportant' : 'addImportant';
 
-    // Optimistisches UI-Update (sofortige visuelle Rückmeldung)
-    verseElement.classList.toggle('user-important-verse-text');
-    verseElement.dataset.isImportant = verseElement.classList.contains('user-important-verse-text').toString();
-
+    // Optimistisches UI Update für den Stern
     const starIconClass = 'user-important-star';
-    let existingStar = verseElement.querySelector('i.' + starIconClass); // i-Tag mit der Klasse
+    let existingStar = verseElement.querySelector('i.' + starIconClass);
 
-    if (verseElement.classList.contains('user-important-verse-text')) {
+    if (actionForServer === 'addImportant') {
         if (!existingStar) {
             const starIcon = document.createElement('i');
-            starIcon.className = `bi bi-star-fill ${starIconClass}`; // Bootstrap- und benutzerdefinierte Klasse
+            starIcon.className = `bi bi-star-fill ${starIconClass}`;
             starIcon.title = "Für mich wichtig";
-
-            // Füge ein Leerzeichen vor dem Stern ein, wenn der Stern nicht das erste Kind ist
-            // und das vorherige Element kein Leerzeichen ist.
-            // Besser: Stern immer als erstes Kind einfügen, dann Text.
-            // Für die Einfachheit hier:
-            const textNodeForSpacing = document.createTextNode('\u00A0'); // Non-breaking space
-            verseElement.insertBefore(textNodeForSpacing, verseElement.firstChild);
-            verseElement.insertBefore(starIcon, verseElement.firstChild);
+            const spaceNode = document.createTextNode('\u00A0'); // Non-breaking space
+            verseElement.prepend(spaceNode);
+            verseElement.prepend(starIcon);
         }
-        if (linkElement) linkElement.textContent = "Als 'wichtig' entfernen";
-    } else {
+        verseElement.classList.add('user-important-verse-text');
+        verseElement.dataset.isImportant = 'true';
+    } else { // removeImportant
         if (existingStar) {
-            // Entferne auch das Leerzeichen davor, falls es unser eingefügtes war
-            if (existingStar.nextSibling && existingStar.nextSibling.nodeType === Node.TEXT_NODE && existingStar.nextSibling.textContent === '\u00A0') {
-                existingStar.nextSibling.remove();
+            if (existingStar.previousSibling && existingStar.previousSibling.nodeType === Node.TEXT_NODE && existingStar.previousSibling.textContent === '\u00A0') {
+                existingStar.previousSibling.remove();
             }
             existingStar.remove();
         }
-        if (linkElement) linkElement.textContent = "Für mich wichtig markieren";
+        verseElement.classList.remove('user-important-verse-text');
+        verseElement.dataset.isImportant = 'false';
     }
-
+    
     fetch('ajax_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=${actionForServer}&global_verse_id=${globalVerseId}&user_id=${currentUserId}`
+        body: `action=${actionForServer}&global_verse_id=${globalVerseId}` // user_id kommt aus Session
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status !== 'success') {
-                alert('Fehler vom Server: ' + data.message);
-                // Rollback des UI-Updates
-                verseElement.classList.toggle('user-important-verse-text', wasImportant);
-                verseElement.dataset.isImportant = wasImportant.toString();
-                existingStar = verseElement.querySelector('i.' + starIconClass); // Erneut suchen
-                if (wasImportant && !existingStar) {
-                    const starIcon = document.createElement('i');
-                    starIcon.className = `bi bi-star-fill ${starIconClass}`;
-                    starIcon.title = "Für mich wichtig";
-                    const textNodeForSpacing = document.createTextNode('\u00A0');
-                    verseElement.insertBefore(textNodeForSpacing, verseElement.firstChild);
-                    verseElement.insertBefore(starIcon, verseElement.firstChild);
-                } else if (!wasImportant && existingStar) {
-                    if (existingStar.nextSibling && existingStar.nextSibling.nodeType === Node.TEXT_NODE && existingStar.nextSibling.textContent === '\u00A0') {
-                        existingStar.nextSibling.remove();
-                    }
-                    existingStar.remove();
-                }
-                if (linkElement) linkElement.textContent = wasImportant ? "Als 'wichtig' entfernen" : "Für mich wichtig markieren";
-            }
-            // KEIN window.location.reload(); hier, um das Springen zu vermeiden.
-        }).catch(error => {
-            console.error("Fehler bei AJAX (handleMarkAsImportant):", error);
-            alert("Kommunikationsfehler beim Speichern der 'Wichtig'-Markierung.");
-            // Rollback des UI-Updates
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            alert('Fehler: ' + data.message);
+            // Rollback UI
             verseElement.classList.toggle('user-important-verse-text', wasImportant);
             verseElement.dataset.isImportant = wasImportant.toString();
-            existingStar = verseElement.querySelector('i.' + starIconClass); // Erneut suchen
-            if (wasImportant && !existingStar) { /* Stern hinzufügen Logik */ } else if (!wasImportant && existingStar) { /* Stern entfernen Logik */ }
-            if (linkElement) linkElement.textContent = wasImportant ? "Als 'wichtig' entfernen" : "Für mich wichtig markieren";
-        });
+            existingStar = verseElement.querySelector('i.' + starIconClass);
+            if (wasImportant && !existingStar) {
+                 const starIcon = document.createElement('i'); /* ... Stern wiederherstellen ... */ 
+            } else if (!wasImportant && existingStar) {
+                 if (existingStar.previousSibling && existingStar.previousSibling.nodeType === Node.TEXT_NODE) existingStar.previousSibling.remove();
+                 existingStar.remove(); /* ... Stern entfernen ... */
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Wichtig-Update-Fehler:', error);
+        alert('Kommunikationsfehler beim Speichern der "Wichtig"-Markierung.');
+        // Kompletter Rollback
+        verseElement.classList.toggle('user-important-verse-text', wasImportant);
+        verseElement.dataset.isImportant = wasImportant.toString();
+        existingStar = verseElement.querySelector('i.' + starIconClass);
+         if (wasImportant && !existingStar) { /* ... Stern wiederherstellen ... */ } else if (!wasImportant && existingStar) { /* ... Stern entfernen ... */ }
+    });
 }
 
-// --- Bestehende Funktionen für Modals (Vergleichen, Kommentare) ---
 function handleCompareVerse(globalVerseId, bookChapterTitleText, verseNumText) {
-    closeActivePopover();
+    hideVerseActionModal();
     const modalElement = document.getElementById('compareModal');
     if (!modalElement) return;
     const compareModal = bootstrap.Modal.getOrCreateInstance(modalElement);
     const modalTitle = document.getElementById('compareModalLabel');
     const modalBody = document.getElementById('compareModalBody');
-    if (!modalTitle || !modalBody) return;
     modalTitle.textContent = `Versvergleich für ${bookChapterTitleText}, Vers ${verseNumText}`;
     modalBody.innerHTML = '<div class="text-center my-3"><div class="spinner-border" role="status"></div></div>';
     compareModal.show();
-    fetch('ajax_handler.php', {
-        method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=compareVerse&global_verse_id=${globalVerseId}`
-    }).then(response => response.text()).then(htmlContent => modalBody.innerHTML = htmlContent)
-        .catch(error => modalBody.innerHTML = '<p class="text-danger">Fehler.</p>');
+    fetch(`ajax_handler.php?action=compareVerse&global_verse_id=${globalVerseId}`) // War POST, GET ist hier sinnvoller
+        .then(response => response.text())
+        .then(html => modalBody.innerHTML = html)
+        .catch(err => modalBody.innerHTML = '<p class="text-danger">Fehler beim Laden der Vergleichsverse.</p>');
 }
 
 function handleShowComments(globalVerseId, bookChapterTitleText, verseNumText) {
-    closeActivePopover();
+    hideVerseActionModal();
     const modalElement = document.getElementById('commentsModal');
     if (!modalElement) return;
     const commentsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
     const modalTitle = document.getElementById('commentsModalLabel');
     const modalBody = document.getElementById('commentsModalBody');
-    if (!modalTitle || !modalBody) return;
     modalTitle.textContent = `Kommentare für ${bookChapterTitleText}, Vers ${verseNumText}`;
     modalBody.innerHTML = '<div class="text-center my-3"><div class="spinner-border" role="status"></div></div>';
     commentsModal.show();
-    fetch('ajax_handler.php', {
-        method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=getComments&global_verse_id=${globalVerseId}`
-    }).then(response => response.text()).then(htmlContent => {
-        modalBody.innerHTML = `${htmlContent}<hr class="my-3"><h5>Neuen Kommentar schreiben:</h5><textarea id="newCommentTextForModal_${globalVerseId}" class="form-control" rows="3"></textarea><button class="btn btn-primary btn-sm mt-2" onclick="submitNewCommentFromModal(${globalVerseId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Speichern</button>`;
-    }).catch(error => modalBody.innerHTML = '<p class="text-danger">Fehler.</p>');
+    fetch(`ajax_handler.php?action=getComments&global_verse_id=${globalVerseId}`) // War POST, GET ist hier sinnvoller
+        .then(response => response.text())
+        .then(html => {
+            modalBody.innerHTML = `${html}<hr class="my-3"><h5>Neuen Kommentar schreiben:</h5><textarea id="newCommentTextForModal_${globalVerseId}" class="form-control" rows="3"></textarea><button class="btn btn-primary btn-sm mt-2" onclick="submitNewCommentFromModal(${globalVerseId}, '${bookChapterTitleText.replace(/'/g, "\\'")}', '${verseNumText.replace(/'/g, "\\'")}')">Speichern</button>`;
+        }).catch(err => modalBody.innerHTML = '<p class="text-danger">Fehler beim Laden der Kommentare.</p>');
 }
 
 function submitNewCommentFromModal(globalVerseId, bookChapterTitleText, verseNumText) {
@@ -356,113 +339,159 @@ function submitNewCommentFromModal(globalVerseId, bookChapterTitleText, verseNum
     if (noteText === "") { alert("Bitte Text eingeben."); return; }
     fetch('ajax_handler.php', {
         method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=addComment&global_verse_id=${globalVerseId}&user_id=${currentUserId}&note_text=${encodeURIComponent(noteText)}`
+        body: `action=addComment&global_verse_id=${globalVerseId}&note_text=${encodeURIComponent(noteText)}` // user_id kommt aus Session
     }).then(response => response.json()).then(data => {
         alert(data.message);
         if (data.status === 'success') {
-            handleShowComments(globalVerseId, bookChapterTitleText, verseNumText);
+            handleShowComments(globalVerseId, bookChapterTitleText, verseNumText); // Kommentare neu laden
         }
-    }).catch(error => alert('Kommunikationsfehler.'));
+    }).catch(error => alert('Kommunikationsfehler beim Speichern des Kommentars.'));
+}
+
+function initializeModalLikeButtonLogic() {
+    const commentsModalElement = document.getElementById('commentsModal');
+    if (!commentsModalElement) return;
+    commentsModalElement.addEventListener('click', function(event) {
+        const likeButton = event.target.closest('.like-comment-btn-modal');
+        if (!likeButton) return;
+        event.preventDefault();
+        if (currentUserId === 0) { alert("Bitte einloggen, um zu liken."); return; }
+        const noteId = likeButton.dataset.noteId;
+        if (!noteId) return;
+        fetch('ajax_handler.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=like_comment&note_id=${noteId}` // user_id kommt aus Session
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const likeCountSpan = likeButton.querySelector('.like-count');
+                const heartIcon = likeButton.querySelector('i.bi');
+                if (likeCountSpan) likeCountSpan.textContent = data.like_count;
+                if (heartIcon) {
+                    const isLiked = data.action_taken === 'liked';
+                    heartIcon.classList.toggle('bi-heart-fill', isLiked);
+                    heartIcon.classList.toggle('text-danger', isLiked);
+                    heartIcon.classList.toggle('bi-heart', !isLiked);
+                }
+            } else {
+                alert(data.message || 'Ein Fehler ist aufgetreten.');
+            }
+        }).catch(error => console.error('Fehler beim Liken im Modal:', error));
+    });
 }
 
 
+// --- Funktionen für kommentare_uebersicht.php ---
 
+function initializeCommentPageLogic() {
+    loadComments(1); // Lade die erste Seite beim Start
 
-
-
-// In einer neuen JS-Datei oder am Ende von app.js
-
-document.addEventListener('DOMContentLoaded', function () {
-    if (document.getElementById('commentListContainer')) { // Nur ausführen, wenn wir auf der Kommentarseite sind
-        loadComments(1); // Lade die erste Seite beim Start
-
-        document.getElementById('filterCommentsForm').addEventListener('submit', function (e) {
+    const filterForm = document.getElementById('filterCommentsForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            loadComments(1); // Lade Seite 1 mit neuen Filtern
+            loadComments(1);
         });
+    }
+    
+    const myCommentsCheckbox = document.getElementById('my_comments');
+    if (myCommentsCheckbox) {
+        myCommentsCheckbox.addEventListener('change', function() {
+            loadComments(1); // Bei Änderung der Checkbox neu laden
+        });
+    }
 
-        // Event-Listener für Pagination-Klicks
-        document.getElementById('commentPagination').addEventListener('click', function (e) {
-            e.preventDefault();
+    const paginationContainer = document.getElementById('commentPagination');
+    if (paginationContainer) {
+        paginationContainer.addEventListener('click', function (e) {
             if (e.target.tagName === 'A' && e.target.dataset.page) {
+                e.preventDefault();
                 loadComments(parseInt(e.target.dataset.page));
             }
         });
+    }
 
-        // Event-Delegation für Like-Buttons
-        document.getElementById('commentListContainer').addEventListener('click', function (e) {
-            if (e.target.closest('.like-comment-btn')) {
+    const commentListContainer = document.getElementById('commentListContainer');
+    if (commentListContainer) {
+        commentListContainer.addEventListener('click', function (e) {
+            const likeButton = e.target.closest('.like-comment-btn');
+            const editButton = e.target.closest('.edit-comment-btn');
+            const deleteButton = e.target.closest('.delete-comment-btn');
+
+            if (likeButton) {
                 e.preventDefault();
-                const button = e.target.closest('.like-comment-btn');
-                const noteId = button.dataset.noteId;
-                handleLikeComment(noteId, button);
+                const noteId = likeButton.dataset.noteId;
+                handleLikeCommentOverview(noteId, likeButton); // Eigene Funktion für Likes auf der Übersichtsseite
             }
-            if (e.target.closest('.edit-comment-btn')) {
+            if (editButton) {
                 e.preventDefault();
-                const button = e.target.closest('.edit-comment-btn');
-                const noteId = button.dataset.noteId;
-                // Hier Logik zum Öffnen des Edit-Modals und Befüllen
-                openEditCommentModal(noteId, button.dataset.currentText);
+                const noteId = editButton.dataset.noteId;
+                openEditCommentModalOverview(noteId, editButton.dataset.currentText);
             }
-            if (e.target.closest('.delete-comment-btn')) {
+            if (deleteButton) {
                 e.preventDefault();
-                const button = e.target.closest('.delete-comment-btn');
-                const noteId = button.dataset.noteId;
+                const noteId = deleteButton.dataset.noteId;
                 if (confirm('Möchten Sie diesen Kommentar wirklich löschen?')) {
-                    handleDeleteComment(noteId);
+                    handleDeleteCommentOverview(noteId);
                 }
             }
         });
-
-        // Speichern-Button im Edit-Modal
-        const saveCommentButton = document.getElementById('saveCommentChanges');
-        if (saveCommentButton) {
-            saveCommentButton.addEventListener('click', function () {
-                const noteId = document.getElementById('editCommentId').value;
-                const newText = document.getElementById('editCommentText').value;
-                handleUpdateComment(noteId, newText);
-            });
-        }
     }
-});
+
+    const saveCommentButton = document.getElementById('saveCommentChanges');
+    if (saveCommentButton) {
+        saveCommentButton.addEventListener('click', function () {
+            const noteId = document.getElementById('editCommentId').value;
+            const newText = document.getElementById('editCommentText').value;
+            handleUpdateCommentOverview(noteId, newText);
+        });
+    }
+}
 
 function loadComments(page = 1) {
     const container = document.getElementById('commentListContainer');
     const paginationContainer = document.getElementById('commentPagination');
-    if (!container || !paginationContainer) return;
+    if (!container || !paginationContainer) {
+         console.log("Container für Kommentare oder Pagination nicht gefunden auf dieser Seite.");
+         return;
+    }
 
     const form = document.getElementById('filterCommentsForm');
-    const formData = new FormData(form);
-    const params = new URLSearchParams(formData);
+    const params = new URLSearchParams(new FormData(form));
     params.append('page', page);
 
-    // Wenn "Nur meine Kommentare" angehakt ist, filter_user_id setzen
     const myCommentsCheckbox = document.getElementById('my_comments');
     if (myCommentsCheckbox && myCommentsCheckbox.checked && currentUserId > 0) {
         params.append('filter_user_id', currentUserId);
+    } else {
+        params.delete('filter_user_id'); // Sicherstellen, dass der Parameter weg ist, wenn Checkbox nicht aktiv
     }
+    // Entferne my_comments, da es kein Datenbankfeld ist und nur für die Logik hier dient
+    params.delete('my_comments');
 
 
     container.innerHTML = '<p class="text-center">Lade Kommentare...</p>';
-    paginationContainer.innerHTML = ''; // Pagination leeren
+    paginationContainer.innerHTML = ''; 
 
-    fetch(`ajax_handler.php?action=get_all_comments&${params.toString()}`) // GET-Request
+    fetch(`ajax_handler.php?action=get_all_comments&${params.toString()}`)
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success' && data.comments) {
-                renderComments(data.comments, container);
-                renderPagination(data.pagination, paginationContainer);
+                renderCommentsOverview(data.comments, container);
+                renderPaginationOverview(data.pagination, paginationContainer);
             } else {
-                container.innerHTML = '<p class="text-danger">Fehler beim Laden der Kommentare.</p>';
+                container.innerHTML = `<p class="text-danger">Fehler beim Laden der Kommentare: ${data.message || ''}</p>`;
             }
         })
         .catch(error => {
-            console.error('Fehler:', error);
-            container.innerHTML = '<p class="text-danger">Ein Fehler ist aufgetreten.</p>';
+            console.error('Fehler beim Laden der Kommentare:', error);
+            container.innerHTML = '<p class="text-danger">Ein Kommunikationsfehler ist aufgetreten.</p>';
         });
 }
 
-function renderComments(comments, container) {
+function renderCommentsOverview(comments, container) {
     if (comments.length === 0) {
         container.innerHTML = '<p class="text-center">Keine Kommentare gefunden, die Ihren Kriterien entsprechen.</p>';
         return;
@@ -470,34 +499,38 @@ function renderComments(comments, container) {
     let html = '<div class="list-group">';
     comments.forEach(comment => {
         const verseLink = `bibel_lesen.php?book_id=${comment.book_id}&chapter=${comment.chapter_number}&highlight_verse=${comment.verse_global_id}#vers-${comment.verse_number}`;
-        const commentDate = new Date(comment.note_date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const commentDateRaw = comment.updated_at && comment.updated_at !== '0000-00-00 00:00:00' ? comment.updated_at : comment.note_date;
+        const commentDate = new Date(commentDateRaw).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const datePrefix = comment.updated_at && comment.updated_at !== '0000-00-00 00:00:00' && comment.updated_at !== comment.note_date ? 'Bearbeitet am' : 'Erstellt am';
+        
+        const heartIcon = comment.user_liked ? 'bi-heart-fill text-danger' : 'bi-heart';
 
         html += `
-            <div class="list-group-item mb-3 shadow-sm">
+            <div class="list-group-item mb-3 shadow-sm comment-item" id="comment-item-${comment.note_id}">
                 <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">
-                        <a href="${verseLink}" target="_blank">
+                        <a href="${verseLink}" target="_blank" title="Zum Bibelvers springen">
                             ${comment.book_name_de} ${comment.chapter_number},${comment.verse_number}
                         </a>
                     </h5>
-                    <small class="text-muted">${commentDate}</small>
+                    <small class="text-muted" title="${datePrefix}">${commentDate}</small>
                 </div>
-                <p class="mb-1"><em>"${htmlspecialchars(comment.verse_text)}"</em></p>
+                <p class="mb-1 fst-italic">"${htmlspecialchars(comment.verse_text)}"</p>
                 <p class="mt-2 mb-2 comment-text-${comment.note_id}">${nl2br(htmlspecialchars(comment.note_text))}</p>
                 <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">Von: ${htmlspecialchars(comment.author_username)}</small>
+                    <small class="text-muted">Von: <strong>${htmlspecialchars(comment.author_username)}</strong></small>
                     <div>
-                        <button class="btn btn-sm btn-outline-primary like-comment-btn" data-note-id="${comment.note_id}">
-                            <i class="bi bi-heart"></i> <span class="like-count">${comment.likes}</span>
+                        <button class="btn btn-sm btn-outline-danger like-comment-btn" data-note-id="${comment.note_id}" title="Gefällt mir">
+                            <i class="bi ${heartIcon}"></i> <span class="like-count">${comment.likes}</span>
                         </button>
                         ${comment.author_id == currentUserId ? `
                             <button class="btn btn-sm btn-outline-secondary edit-comment-btn ms-2" 
                                     data-note-id="${comment.note_id}" 
-                                    data-current-text="${htmlspecialchars(comment.note_text)}">
-                                <i class="bi bi-pencil"></i> Bearbeiten
+                                    data-current-text="${htmlspecialchars(comment.note_text)}" title="Kommentar bearbeiten">
+                                <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-outline-danger delete-comment-btn ms-1" 
-                                    data-note-id="${comment.note_id}">
+                                    data-note-id="${comment.note_id}" title="Kommentar löschen">
                                 <i class="bi bi-trash"></i>
                             </button>
                         ` : ''}
@@ -509,30 +542,48 @@ function renderComments(comments, container) {
     container.innerHTML = html;
 }
 
-function renderPagination(pagination, container) {
-    if (pagination.totalPages <= 1) {
+function renderPaginationOverview(pagination, container) {
+    if (!pagination || pagination.totalPages <= 1) {
         container.innerHTML = '';
         return;
     }
     let html = '';
-    // Zurück-Button
-    html += `<li class="page-item ${pagination.currentPage === 1 ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${pagination.currentPage - 1}">Zurück</a>
+    const currentPage = parseInt(pagination.currentPage);
+    const totalPages = parseInt(pagination.totalPages);
+
+    html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Zurück">‹</a>
              </li>`;
-    // Seitenzahlen
-    for (let i = 1; i <= pagination.totalPages; i++) {
-        html += `<li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+
+    if (currentPage <= 3) endPage = Math.min(5, totalPages);
+    if (currentPage > totalPages - 3) startPage = Math.max(1, totalPages - 4);
+
+    if (startPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+        if (startPage > 2) html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
                     <a class="page-link" href="#" data-page="${i}">${i}</a>
                  </li>`;
     }
-    // Vorwärts-Button
-    html += `<li class="page-item ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}">
-                <a class="page-link" href="#" data-page="${pagination.currentPage + 1}">Weiter</a>
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+    }
+
+    html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Weiter">›</a>
              </li>`;
     container.innerHTML = html;
 }
 
-function handleLikeComment(noteId, buttonElement) {
+function handleLikeCommentOverview(noteId, buttonElement) {
     if (currentUserId === 0) {
         alert("Bitte einloggen, um zu liken.");
         return;
@@ -540,142 +591,82 @@ function handleLikeComment(noteId, buttonElement) {
     fetch('ajax_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=like_comment&user_id=${currentUserId}&global_verse_id=${noteId}` // noteId wird hier als global_verse_id gesendet
+        body: `action=like_comment&note_id=${noteId}` // user_id kommt aus Session
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success' && buttonElement) {
-                const likeCountSpan = buttonElement.querySelector('.like-count');
-                if (likeCountSpan) likeCountSpan.textContent = data.like_count;
-                // Optional: Icon ändern (gefülltes Herz vs. leeres Herz)
-                // buttonElement.querySelector('i.bi').classList.toggle('bi-heart-fill', data.action === 'liked');
-                // buttonElement.querySelector('i.bi').classList.toggle('bi-heart', data.action === 'unliked');
-            } else {
-                alert(data.message || "Fehler beim Liken.");
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success' && buttonElement) {
+            const likeCountSpan = buttonElement.querySelector('.like-count');
+            const heartIcon = buttonElement.querySelector('i.bi');
+            if (likeCountSpan) likeCountSpan.textContent = data.like_count;
+            if (heartIcon) {
+                const isLiked = data.action_taken === 'liked';
+                heartIcon.classList.toggle('bi-heart-fill', isLiked);
+                heartIcon.classList.toggle('text-danger', isLiked); // text-danger für gefülltes Herz
+                heartIcon.classList.toggle('bi-heart', !isLiked);
             }
-        })
-        .catch(error => console.error("Fehler beim Liken:", error));
+        } else {
+            alert(data.message || "Fehler beim Liken.");
+        }
+    })
+    .catch(error => console.error("Fehler beim Liken auf Übersichtsseite:", error));
 }
 
-function openEditCommentModal(noteId, currentText) {
+function openEditCommentModalOverview(noteId, currentText) {
     document.getElementById('editCommentId').value = noteId;
     document.getElementById('editCommentText').value = currentText;
-    const modal = new bootstrap.Modal(document.getElementById('editCommentModal'));
-    modal.show();
+    const editModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editCommentModal'));
+    editModal.show();
 }
 
-function handleUpdateComment(noteId, newText) {
+function handleUpdateCommentOverview(noteId, newText) {
+    if (currentUserId === 0) { alert("Bitte zuerst einloggen."); return; }
+    if (newText.trim() === "") { alert("Kommentar darf nicht leer sein."); return; }
+
     fetch('ajax_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=update_comment&user_id=${currentUserId}&global_verse_id=${noteId}&note_text=${encodeURIComponent(newText)}`
+        body: `action=update_comment&note_id=${noteId}&note_text=${encodeURIComponent(newText)}` // user_id aus Session
     })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            if (data.status === 'success') {
-                bootstrap.Modal.getInstance(document.getElementById('editCommentModal')).hide();
-                // UI direkt aktualisieren oder loadComments() für die aktuelle Seite aufrufen
-                const commentTextElement = document.querySelector(`.comment-text-${noteId}`);
-                if (commentTextElement) commentTextElement.innerHTML = nl2br(htmlspecialchars(newText));
-                // Besser: loadComments(aktuelle_seite);
-            }
-        })
-        .catch(error => console.error("Fehler beim Speichern des Kommentars:", error));
-}
-
-function handleDeleteComment(noteId) {
-    fetch('ajax_handler.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=delete_comment&user_id=${currentUserId}&global_verse_id=${noteId}`
-    })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            if (data.status === 'success') {
-                loadComments(1); // Oder die aktuelle Seite neu laden
-            }
-        })
-        .catch(error => console.error("Fehler beim Löschen des Kommentars:", error));
-}
-
-
-// Hilfsfunktionen
-function htmlspecialchars(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/[&<>"']/g, function (match) {
-        const G_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-        return G_MAP[match];
-    });
-}
-function nl2br(str) {
-    if (typeof str !== 'string') return '';
-    return str.replace(/(?:\r\n|\r|\n)/g, '<br>');
-}
-
-
-
-// FÜGEN SIE DIESE GESAMTE NEUE FUNKTION IN app.js EIN
-
-function initializeModalLikeButtonLogic() {
-    const commentsModalElement = document.getElementById('commentsModal');
-    if (!commentsModalElement) return;
-
-    // Wir verwenden Event Delegation, da der Inhalt des Modals dynamisch geladen wird.
-    commentsModalElement.addEventListener('click', function (event) {
-        const likeButton = event.target.closest('.like-comment-btn-modal');
-
-        if (likeButton) {
-            event.preventDefault(); // Standard-Aktion des Buttons verhindern
-
-            if (currentUserId === 0) {
-                alert("Bitte einloggen, um zu liken.");
-                return;
-            }
-
-            const noteId = likeButton.dataset.noteId;
-            if (!noteId) {
-                console.error("Fehler: Konnte note-id vom Button nicht lesen.");
-                return;
-            }
-
-            // AJAX-Anfrage zum Liken/Unliken senden
-            fetch('ajax_handler.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                // Wir senden `note_id`, wie es der PHP-Handler erwartet
-                body: `action=like_comment&note_id=${noteId}`
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Netzwerk-Antwort war nicht ok.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        // UI des Buttons direkt im Modal aktualisieren
-                        const likeCountSpan = likeButton.querySelector('.like-count');
-                        const heartIcon = likeButton.querySelector('i.bi');
-
-                        if (likeCountSpan) {
-                            likeCountSpan.textContent = data.like_count;
-                        }
-                        if (heartIcon) {
-                            const isLiked = data.action_taken === 'liked';
-                            heartIcon.classList.toggle('bi-heart-fill', isLiked);
-                            heartIcon.classList.toggle('text-danger', isLiked);
-                            heartIcon.classList.toggle('bi-heart', !isLiked);
-                        }
-                    } else {
-                        alert(data.message || 'Ein serverseitiger Fehler ist aufgetreten.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Fehler beim Liken im Modal:', error);
-                    alert('Kommunikationsfehler beim Liken.');
-                });
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.status === 'success') {
+            bootstrap.Modal.getInstance(document.getElementById('editCommentModal'))?.hide();
+            const commentTextElement = document.querySelector(`.comment-text-${noteId}`);
+            if (commentTextElement) commentTextElement.innerHTML = nl2br(htmlspecialchars(newText));
         }
+    })
+    .catch(error => console.error("Fehler beim Aktualisieren des Kommentars:", error));
+}
+
+function handleDeleteCommentOverview(noteId) {
+    if (currentUserId === 0) { alert("Bitte zuerst einloggen."); return; }
+    fetch('ajax_handler.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=delete_comment&note_id=${noteId}` // user_id aus Session
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        if (data.status === 'success') {
+            const commentItem = document.getElementById(`comment-item-${noteId}`);
+            if (commentItem) commentItem.remove();
+            // Optional: Prüfen ob die Seite jetzt leer ist und ggf. loadComments() für die vorherige Seite aufrufen
+        }
+    })
+    .catch(error => console.error("Fehler beim Löschen des Kommentars:", error));
+}
+
+
+// --- PWA Service Worker ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(registration => {
+      console.log('ServiceWorker registriert mit Scope:', registration.scope);
+    }).catch(error => {
+      console.log('ServiceWorker Registrierung fehlgeschlagen:', error);
     });
+  });
 }

@@ -8,7 +8,7 @@
 require_once 'config.php';
 
 // index.php
-header('Location: welcome.php');
+header('Location: bibel_lesen.php');
 exit();
 
 // Alternativ könnten Sie hier eine kleine Willkommensseite mit Links anzeigen:
