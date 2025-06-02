@@ -117,9 +117,9 @@ function showVerseActionsInModal(verseElement) {
     modalTitle.textContent = `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`;
 
     const highlightColors = [
-        { name: 'Wichtig (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, { name: 'Verheißung (Grün)', value: 'green', cssClass: 'bg-green-custom' },
+        { name: 'Wichtig (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, { name: 'Ermutigung & Trost (Grün)', value: 'green', cssClass: 'bg-green-custom' },
         { name: 'Gebot (Blau)', value: 'blue', cssClass: 'bg-blue-custom' }, { name: 'Sünde/Warnung (Rot)', value: 'red', cssClass: 'bg-red-custom' },
-        { name: 'Prophetie (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, { name: 'Geschichte (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
+        { name: 'Verheißung & Prophetie (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, { name: 'Geschichte (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
         { name: 'Gleichnis (Türkis)', value: 'parable', cssClass: 'bg-parable-custom' }, { name: 'Zurechtweisung (Lavendel)', value: 'rebuke', cssClass: 'bg-rebuke-custom' },
         { name: 'Namen/Orte (Oliv)', value: 'name', cssClass: 'bg-name-custom' }, { name: 'Heiligung (Rosé)', value: 'sanctification', cssClass: 'bg-sanctification-custom' },
         { name: 'Wunder (Gold)', value: 'miracle', cssClass: 'bg-miracle-custom' }, { name: 'Gottes Wirken (Himmelblau)', value: 'gods_work', cssClass: 'bg-gods-work-custom' },

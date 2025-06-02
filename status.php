@@ -15,10 +15,10 @@ require_once 'header.php';
 $highlightColorsPHP = [
     // Diese HEX-Werte sind Beispiele und MÜSSEN an Ihre `styles.css` angepasst werden!
     'yellow' => ['name' => 'Wichtig',        'hex' => '#ffe082'], // bg-warning
-    'green'  => ['name' => 'Verheißung',     'hex' => '#a5d6a7'], // bg-green-custom
+    'green'  => ['name' => 'Ermutigung & Trost',     'hex' => '#a5d6a7'], // bg-green-custom
     'blue'   => ['name' => 'Gebot',          'hex' => '#90caf9'], // bg-blue-custom
     'red'    => ['name' => 'Sünde/Warnung',  'hex' => '#ef9a9a'], // bg-red-custom
-    'orange' => ['name' => 'Prophetie',      'hex' => '#ffcc80'], // bg-orange-custom
+    'orange' => ['name' => 'Verheißung & Prophetie',      'hex' => '#ffcc80'], // bg-orange-custom
     'brown'  => ['name' => 'Geschichte',     'hex' => '#d2b48c'], // bg-brown-custom
     'parable' => ['name' => 'Gleichnis',      'hex' => '#a0e6d7'], // bg-parable-custom
     'rebuke' => ['name' => 'Zurechtweisung', 'hex' => '#d1c4e9'], // bg-rebuke-custom

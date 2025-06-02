@@ -20,7 +20,7 @@ if (session_status() == PHP_SESSION_NONE) {
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
-define('DB_NAME', 'bibelapp_db'); // Name Ihrer Datenbank
+define('DB_NAME', 'dbs14268018'); // Name Ihrer Datenbank
 
 // Globale PDO-Verbindungsvariable
 $pdo = null;

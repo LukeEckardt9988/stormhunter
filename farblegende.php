@@ -14,10 +14,10 @@ require_once 'header.php';
 $colorLegend = [
     // Existierende Farben
     ['name' => 'Wichtig', 'value' => 'yellow', 'cssClass' => 'bg-warning', 'description' => 'Hervorhebung besonders wichtiger Verse oder Abschnitte.'],
-    ['name' => 'Verheißung', 'value' => 'green', 'cssClass' => 'bg-green-custom', 'description' => 'Zusagen und Verheißungen Gottes.'],
+    ['name' => 'Ermutigung & Trost', 'value' => 'green', 'cssClass' => 'bg-green-custom', 'description' => 'Verse die Ermutigen oder in schwierigen Zeiten trost spenden.'],
     ['name' => 'Gebot', 'value' => 'blue', 'cssClass' => 'bg-blue-custom', 'description' => 'Gebote, Anweisungen und Aufforderungen Gottes.'],
     ['name' => 'Sünde / Warnung', 'value' => 'red', 'cssClass' => 'bg-red-custom', 'description' => 'Hinweise auf Sünde, Fehler oder Warnungen.'],
-    ['name' => 'Prophetie', 'value' => 'orange', 'cssClass' => 'bg-orange-custom', 'description' => 'Weissagungen, prophetische Worte und zukünftige Ereignisse.'],
+    ['name' => 'Verheißung & Prophetie', 'value' => 'orange', 'cssClass' => 'bg-orange-custom', 'description' => 'Weissagungen, prophetische Worte und zukünftige Ereignisse.'],
     ['name' => 'Geschichte', 'value' => 'brown', 'cssClass' => 'bg-brown-custom', 'description' => 'Historische Berichte, Erzählungen und Genealogien.'],
     ['name' => 'Gleichnis', 'value' => 'parable', 'cssClass' => 'bg-parable-custom', 'description' => 'Bildhafte Erzählungen und Gleichnisse Jesu oder anderer biblischer Figuren.'],
     ['name' => 'Zurechtweisung / Ermahnung', 'value' => 'rebuke', 'cssClass' => 'bg-rebuke-custom', 'description' => 'Korrektur, Tadel oder ernste Ermahnungen.'],
