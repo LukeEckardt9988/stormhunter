@@ -1,6 +1,26 @@
 <?php
 require_once 'config.php'; // Lädt Konfiguration, $pdo
+// NEU: Zugriffsschutz
+$loggedInUserId = $_SESSION['user_id'] ?? 0;
+$loggedInCommunityId = $_SESSION['community_id'] ?? 0; // Wichtig für Gemeindefilter
 
+if ($loggedInUserId === 0) {
+    header('Location: login.php?redirect=highscore.php'); // Nicht eingeloggte User zum Login leiten
+    exit();
+}
+
+if ($loggedInCommunityId === 0) {
+    // Benutzer ist eingeloggt, aber in keiner Gemeinde.
+    // Entscheiden Sie, was hier passieren soll:
+    // 1. Fehlermeldung anzeigen und keinen Highscore.
+    // 2. Zu einer Seite leiten, wo sie einer Gemeinde beitreten können (z.B. welcome.php).
+    $pageTitle = "Highscore";
+    require_once 'header.php';
+    echo '<div class="container mt-4"><div class="alert alert-warning">Sie müssen Mitglied einer Gemeinde sein, um den Highscore sehen zu können. <a href="welcome.php">Gemeinde beitreten oder erstellen</a>.</div></div>';
+    require_once 'footer.php';
+    exit();
+}
+// ENDE NEU: Zugriffsschutz
 $loggedInUserId = $_SESSION['user_id'] ?? 0;
 $loggedInUsername = $_SESSION['username'] ?? 'Gast';
 
@@ -95,3 +115,6 @@ require_once 'header.php';
 <?php
 require_once 'footer.php';
 ?>
+
+
+

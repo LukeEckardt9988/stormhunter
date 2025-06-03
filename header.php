@@ -109,6 +109,12 @@ if ($loggedInUserId !== 0 && isset($pdo)) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
+                        <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''); ?> d-flex flex-column align-items-center text-center px-2" href="dashboard.php" aria-label="Aktuelles & Inspirationen" title="Aktuelles & Inspirationen">
+                            <i class="bi bi-house-door-fill" style="font-size: 1.5rem;"></i>
+                            <span class="nav-link-text">Start</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'bibel_lesen.php' ? 'active' : ''); ?> d-flex flex-column align-items-center text-center px-2" href="bibel_lesen.php" aria-label="Bibel lesen" title="Bibel lesen">
                             <i class="bi bi-eyeglasses" style="font-size: 1.5rem;"></i>
                             <span class="nav-link-text">Lesen</span>
@@ -176,6 +182,23 @@ if ($loggedInUserId !== 0 && isset($pdo)) {
                             <i class="bi bi-moon-fill theme-icon-moon d-none"></i>
                         </button>
                     </li>
+                     <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == NEWS_ADMIN_USER_ID): // Prüft auf Ihre User-ID ?>
+                        <?php if (isset($_SESSION['admin_post_pw_verified']) && $_SESSION['admin_post_pw_verified'] === true): ?>
+                            <li class="nav-item">
+                                <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'create_news_post.php' ? 'active' : ''); ?> d-flex flex-column align-items-center text-center px-2" href="create_news_post.php" aria-label="Neuer Beitrag" title="Neuer Beitrag">
+                                    <i class="bi bi-plus-square-fill" style="font-size: 1.5rem;"></i>
+                                    <span class="nav-link-text">Post Neu</span>
+                                </a>
+                            </li>
+                        <?php else: ?>
+                            <li class="nav-item">
+                                 <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'create_news_post.php' ? 'active' : ''); ?> d-flex flex-column align-items-center text-center px-2" href="create_news_post.php" aria-label="Admin Post Login" title="Admin Post Login">
+                                    <i class="bi bi-key-fill" style="font-size: 1.5rem;"></i>
+                                    <span class="nav-link-text">Post Admin</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

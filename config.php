@@ -12,6 +12,14 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+define('ADMIN_POST_PASSWORD_HASH', '$2y$10$2HVddOoKXAVEDzKvqOAmgOOMx3jnzICJjbJxivcNDJDqcfmSPEZ0q');
+
+// Die user_id, die als Admin für das Posten von News gilt (Ihre user_id)
+define('NEWS_ADMIN_USER_ID', 1); // Ihre User-ID
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 // Datenbank-Zugangsdaten
 define('DB_SERVER', 'localhost');

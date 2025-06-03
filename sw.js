@@ -1,11 +1,11 @@
-const CACHE_NAME = 'bibel-app-cache-v2'; // NEUE VERSION HIER!
+const CACHE_NAME = 'bibel-app-cache-v3'; // NEUE VERSION HIER!
 // Liste der Dateien, die immer gecacht werden sollen (die "App-Hülle")
 // Tipp: Fügen Sie hier auch Cache-Busting Parameter hinzu, wenn sich Dateien ändern
 const urlsToCache = [
   '/',
   '/index.php',
   '/styles.css?v=2', // Beispiel: ?v=2 wenn sich styles.css geändert hat
-  '/app.js?v=2',     // Beispiel: ?v=2 wenn sich app.js geändert hat
+  '/app.js?v=3',     // Beispiel: ?v=2 wenn sich app.js geändert hat
   '/192.png',        // Wenn Icons sich nicht ändern, kein ?v= nötig
   '/512.png',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',

@@ -739,3 +739,33 @@ body.dark-mode .bg-covenant-custom { background-color: #880e4f !important; color
 body.dark-mode .text-muted {
     color: #8ab4f8 !important; /* Sanftes Hellblau für gedämpften Text */
 }
+
+
+
+
+/* ==========================================================================
+News-Artikel-Karten
+   ========================================================================== */
+
+.news-article-card .card-img-top,
+.news-article-card .card-img-top-placeholder { /* Für iframes */
+    max-height: 250px;
+    object-fit: cover;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+.news-article-card .article-text-preview {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    /* max-height: 100px; Gesteuert durch mb_strimwidth im PHP */
+    /* overflow: hidden; */
+}
+.news-article-card .read-more-news {
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+.news-like-btn i.bi-heart-fill {
+    color: var(--bs-danger);
+}
+.news-like-btn.active {
+    /* Bootstrap .active färbt Buttons oft schon ein, hier ggf. spezifischer */
+}

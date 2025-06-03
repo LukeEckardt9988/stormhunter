@@ -1,0 +1,37 @@
+-- 1. Tabelle für News-Artikel
+CREATE TABLE news_articles (
+    article_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL, -- Ihre User-ID als Ersteller (Admin)
+    title VARCHAR(255) NOT NULL,
+    content_type ENUM('image', 'video_embed', 'video_link', 'external_link', 'text') NOT NULL,
+    media_url VARCHAR(1024) NULL,
+    article_text TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    is_published BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- 2. Tabelle für Likes der News-Artikel
+CREATE TABLE news_article_likes (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    article_id INT NOT NULL,
+    user_id INT NOT NULL,
+    liked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (article_id) REFERENCES news_articles(article_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_like (article_id, user_id)
+);
+
+-- 3. Tabelle für Kommentare zu News-Artikeln
+CREATE TABLE news_article_comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    article_id INT NOT NULL,
+    user_id INT NOT NULL,
+    comment_text TEXT NOT NULL,
+    comment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    is_public BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (article_id) REFERENCES news_articles(article_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
