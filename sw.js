@@ -1,15 +1,32 @@
-const CACHE_NAME = 'bibel-app-cache-v3'; // NEUE VERSION HIER!
+// sw.js
+
+const CACHE_NAME = 'bibel-app-cache-v4'; // NEUE VERSION HIER! (z.B. von v3 auf v4)
+
 // Liste der Dateien, die immer gecacht werden sollen (die "App-Hülle")
-// Tipp: Fügen Sie hier auch Cache-Busting Parameter hinzu, wenn sich Dateien ändern
 const urlsToCache = [
-  '/',
-  '/index.php',
-  '/styles.css?v=2', // Beispiel: ?v=2 wenn sich styles.css geändert hat
-  '/app.js?v=3',     // Beispiel: ?v=2 wenn sich app.js geändert hat
-  '/192.png',        // Wenn Icons sich nicht ändern, kein ?v= nötig
+  '/',                        // Deine Startseite (oft index.php)
+  '/index.php',               // Explizit, falls unterschiedlich zu '/'
+  '/dashboard.php',           // Wichtige, geänderte Seite
+  // '/news_article.php',     // Die *Grundstruktur* der Artikelseite, falls gewünscht.
+                              // Die individuellen Artikel selbst werden nicht hier gecacht.
+
+  // Cache-Busting für geänderte Assets:
+  '/styles.css?v=3',          // Erhöhe Version, wenn styles.css geändert wurde
+  '/app.js?v=4',              // Erhöhe Version, wenn app.js geändert wurde
+  '/dashboard.js?v=1',        // Erhöhe Version, wenn dashboard.js geändert wurde (oder v=1 wenn neu)
+  // '/helpers.php',          // PHP-Dateien, die nur via include genutzt werden, müssen NICHT hier rein.
+                              // Deren Änderungen wirken sich auf die PHP-Seiten aus, die sie includen (z.B. dashboard.php)
+
+  // Statische Assets (Icons etc.)
+  '/512ohneBG.png',           // Dein Logo, falls es sich geändert hat oder neu ist
+  '/192.png',
   '/512.png',
+  '/manifest.json',           // Die Manifest-Datei
+
+  // Externe Bibliotheken (werden vom CDN gecacht, aber hier für die App-Shell-Definition)
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
+  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js' // Wenn du Bootstrap JS auch offline brauchst
 ];
 
 // Event: Installation des Service Workers
@@ -19,132 +36,121 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Cache geöffnet:', CACHE_NAME);
-        return cache.addAll(urlsToCache);
+        // Wichtig: addAll ist atomar. Wenn eine Datei nicht geladen werden kann, schlägt das ganze addAll fehl.
+        // Stelle sicher, dass alle URLs korrekt sind und erreichbar.
+        return cache.addAll(urlsToCache.map(url => new Request(url, { cache: 'reload' }))); // 'reload' um sicherzustellen, dass frische Kopien vom Server geholt werden
       })
       .then(() => {
-        // Optional, aber oft empfohlen für schnellere Aktivierung neuer SWs,
-        // besonders wenn man die "Update verfügbar"-Benachrichtigung (skipWaiting) nicht manuell implementiert.
-        // Wenn Sie skipWaiting hier verwenden, wird der neue SW schneller aktiv,
-        // aber Clients könnten kurzzeitig eine Mischung aus altem Client-Code und neuem Cache haben.
-        // Für die robusteste Lösung mit User-Benachrichtigung (siehe meine vorige ausführliche Antwort) lassen Sie dies hier weg
-        // und steuern skipWaiting über eine postMessage von der Client-Seite.
-        // Für eine einfache Lösung KÖNNEN Sie es hier aktivieren:
-        // return self.skipWaiting(); 
+        // Optional: self.skipWaiting() hier aufrufen, wenn der neue SW sofort aktiv werden soll.
+        // Besser ist es oft, dies über eine User-Interaktion (z.B. "Update installieren"-Button) zu steuern.
+        // Für eine einfache Lösung kannst du es hier aktivieren:
+        // return self.skipWaiting();
+        console.log('Service Worker: Installation abgeschlossen für', CACHE_NAME);
+      })
+      .catch(error => {
+        console.error('Service Worker: Fehler bei der Installation und dem Cachen der App-Shell:', error);
       })
   );
 });
 
-// NEU: Event zum Aufräumen alter Caches
+// Event: Aktivierung des Service Workers (Aufräumen alter Caches)
 self.addEventListener('activate', event => {
   console.log('Service Worker: Aktiviere Version', CACHE_NAME);
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) { // Alle Caches löschen, die nicht dem aktuellen CACHE_NAME entsprechen
+          if (cacheName !== CACHE_NAME) {
             console.log('Service Worker: Lösche alten Cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
+      console.log('Service Worker: Alte Caches gelöscht, beanspruche Clients.');
       // Nachdem alte Caches gelöscht wurden, kann der neue SW die Kontrolle über alle offenen Clients beanspruchen.
       return self.clients.claim();
     })
   );
 });
 
-// Event: Abfangen von Netzwerk-Anfragen (Ihre bestehende Logik ist hier gut für "Cache First")
+// Event: Abfangen von Netzwerk-Anfragen
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response; // Aus dem Cache bedienen
-        }
-        // Wenn nicht im Cache, vom Netzwerk holen
-        // Optional: Die Netzwerkantwort hier auch zum Cache hinzufügen für zukünftige Offline-Nutzung
-        return fetch(event.request).then(
-          networkResponse => {
-            // Überprüfen, ob wir eine gültige Antwort erhalten haben
-            // und ob es sich um eine GET-Anfrage handelt (andere Typen wie POST sollten nicht gecacht werden)
-            if(!networkResponse || networkResponse.status !== 200 || event.request.method !== 'GET') {
-              return networkResponse;
-            }
+  // Wir wollen PHP-Seiten und API-Aufrufe (wie ajax_handler_news.php) in der Regel
+  // nicht aggressiv aus dem Cache bedienen, es sei denn, sie sind explizit als App-Shell-Teil definiert
+  // oder wir haben eine "Network falling back to Cache" Strategie für sie.
 
-            // WICHTIG: Klonen Sie die Antwort. Eine Antwort ist ein Stream und
-            // kann nur einmal konsumiert werden. Wir müssen eine Kopie für den Browser
-            // und eine für den Cache erstellen.
-            // Wir wollen hier aber nur die "App-Hülle" aggressiv cachen,
-            // andere dynamische Inhalte oder API-Aufrufe sollten eine andere Cache-Strategie haben.
-            // Für die in urlsToCache definierten Dateien ist das okay.
-            // Für andere Anfragen könnte man hier entscheiden, sie nicht zu cachen oder eine Network-First-Strategie zu fahren.
-            // In Ihrem Fall, da Sie hauptsächlich die urlsToCache bedienen, ist die Logik oben i.O.
+  const requestUrl = new URL(event.request.url);
 
-            /* Beispiel für dynamisches Caching von Netzwerk-Antworten (vorsichtig einsetzen):
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Nur bestimmte Dateitypen oder Pfade cachen, um nicht alles vollzumüllen
-                if (event.request.url.includes('.png') || event.request.url.includes('.jpg')) {
-                     cache.put(event.request, responseToCache);
-                }
-              });
-            */
-            return networkResponse;
+  // Für Anfragen an CDNs (Bootstrap etc.), die in urlsToCache sind, ist Cache-First gut.
+  // Für lokale Assets (CSS, JS, Bilder), die in urlsToCache sind, ebenfalls.
+  if (urlsToCache.some(cachedUrl => requestUrl.pathname === new URL(cachedUrl, self.location.origin).pathname || requestUrl.href === cachedUrl )) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) {
+            return response; // Aus dem Cache bedienen
           }
-        );
-      }
-    )
-  );
+          // Wenn eine in urlsToCache definierte Ressource nicht im Cache ist (sollte nicht passieren nach erfolgreicher Installation),
+          // hole sie vom Netzwerk. Hier könntest du sie optional auch zum Cache hinzufügen.
+          return fetch(event.request).then(networkResponse => {
+            // Optional: Hier die Antwort zum Cache hinzufügen, wenn es eine Shell-Ressource war, die fehlte.
+            // Aber normalerweise sollte sie bei der Installation gecacht worden sein.
+            return networkResponse;
+          });
+        })
+    );
+    return; // Wichtig: Bearbeitung hier beenden
+  }
+
+  // Für andere Anfragen (z.B. dynamische PHP-Seiten, API-Calls): Network First Strategie
+  // Dies stellt sicher, dass du immer die neuesten Daten von news_article.php oder ajax_handler_news.php bekommst,
+  // solange eine Netzwerkverbindung besteht.
+  // Optional: Bei Fehlschlag auf Cache zurückgreifen (Network falling back to Cache).
+  if (requestUrl.pathname.endsWith('.php') || requestUrl.pathname.includes('ajax_handler')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(networkResponse => {
+          // Optional: Die erfolgreiche Netzwerkantwort für bestimmte dynamische Inhalte cachen.
+          // Dies ist komplexer, da man entscheiden muss, wie lange und welche Antworten gecacht werden.
+          // Beispiel:
+          // if (networkResponse && networkResponse.ok && event.request.method === 'GET' && requestUrl.pathname.startsWith('/news_article.php')) {
+          //   const responseToCache = networkResponse.clone();
+          //   caches.open(CACHE_NAME + '-dynamic').then(cache => { // Eigener Cache für dynamische Inhalte
+          //     cache.put(event.request, responseToCache);
+          //   });
+          // }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Netzwerkfehler: Versuche, aus dem Cache zu antworten (falls zuvor gecacht)
+          // Dies ist nützlich, wenn du eine Offline-Version einer Artikelseite haben möchtest,
+          // die der Nutzer bereits einmal online besucht hat.
+          // return caches.match(event.request);
+          // Oder eine generische Offline-Seite anzeigen:
+          // return caches.match('/offline.html'); // Wenn du eine offline.html gecacht hast
+          
+          // Für den Moment: Einfach den Netzwerkfehler durchlassen, wenn keine spezielle Offline-Logik implementiert ist
+          // für dynamische Seiten. Der Browser zeigt dann seine Standard-Offline-Meldung.
+          console.warn('Service Worker: Netzwerk-Anfrage fehlgeschlagen, keine Cache-Alternative für', event.request.url);
+          // Hier könntest du eine Response mit einem Fehlerstatus erstellen, wenn gewollt
+        })
+    );
+    return;
+  }
+
+  // Standard-Verhalten für alle anderen Anfragen: Versuche Cache, dann Netzwerk (wie oben für urlsToCache)
+  // oder einfach nur Netzwerk, wenn es sich nicht um bekannte Shell-Assets handelt.
+  // Die Logik oben deckt bereits die urlsToCache ab.
+  // Für alles andere, was nicht explizit behandelt wird, hier einfach Netzwerk:
+  event.respondWith(fetch(event.request));
 });
 
-// NEU (Optional, aber empfohlen für die "Update verfügbar"-Benachrichtigung):
-// Listener für Nachrichten von der Client-Seite (z.B. von app.js)
+
+// Listener für Nachrichten von der Client-Seite (z.B. von app.js für skipWaiting)
 self.addEventListener('message', event => {
   if (event.data && event.data.action === 'skipWaiting') {
     console.log('Service Worker: skipWaiting wurde von Client aufgerufen.');
     self.skipWaiting();
   }
 });
-
-/*const CACHE_NAME = 'bibel-app-cache-v1';
-// Liste der Dateien, die immer gecacht werden sollen (die "App-Hülle")
-const urlsToCache = [
-  '/',
-  '/index.php',
-  '/styles.css',
-  '/app.js',
-  '/192.png',
-  '/512.png',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css'
-];
-
-// Event: Installation des Service Workers
-self.addEventListener('install', event => {
-  // Warte, bis der Cache geöffnet und alle Dateien hinzugefügt wurden
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Cache geöffnet');
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-// Event: Abfangen von Netzwerk-Anfragen
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Wenn die angeforderte Ressource im Cache gefunden wird, gib sie von dort zurück
-        if (response) {
-          return response;
-        }
-        // Ansonsten, führe die normale Netzwerkanfrage aus
-        return fetch(event.request);
-      }
-    )
-  );
-});*/
