@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('FEHLER: Bootstrap ist nicht geladen!');
         return;
     }
-    
+
     // Logik für bibel_lesen.php (und global)
     initializeThemeToggler();
-    initializeVerseActionLogic(); 
+    initializeVerseActionLogic();
     initializeModalLikeButtonLogic(); // Für Likes im Kommentare-Modal von bibel_lesen.php
 
     const brushModeButton = document.getElementById('brush-mode-toggle');
@@ -93,9 +93,9 @@ function initializeVerseActionLogic() {
                 return;
             }
             handleColorHighlight(clickedVerse.dataset.globalId, lastColor);
-            return; 
+            return;
         }
-        
+
         showVerseActionsInModal(clickedVerse);
     });
 }
@@ -105,7 +105,7 @@ function showVerseActionsInModal(verseElement) {
     if (!modalElement) return;
 
     const verseActionModal = bootstrap.Modal.getOrCreateInstance(modalElement);
-    
+
     const globalId = verseElement.dataset.globalId;
     const verseNumSpan = verseElement.previousElementSibling;
     const verseNumText = verseNumSpan ? verseNumSpan.textContent.trim() : '';
@@ -117,34 +117,43 @@ function showVerseActionsInModal(verseElement) {
     modalTitle.textContent = `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`;
 
     const highlightColors = [
-        { name: 'Wichtig (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, { name: 'Ermutigung & Trost (Grün)', value: 'green', cssClass: 'bg-green-custom' },
-        { name: 'Gebot (Blau)', value: 'blue', cssClass: 'bg-blue-custom' }, { name: 'Sünde/Warnung (Rot)', value: 'red', cssClass: 'bg-red-custom' },
-        { name: 'Verheißung & Prophetie (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, { name: 'Geschichte (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
-        { name: 'Gleichnis (Türkis)', value: 'parable', cssClass: 'bg-parable-custom' }, { name: 'Zurechtweisung (Lavendel)', value: 'rebuke', cssClass: 'bg-rebuke-custom' },
-        { name: 'Namen/Orte (Oliv)', value: 'name', cssClass: 'bg-name-custom' }, { name: 'Heiligung (Rosé)', value: 'sanctification', cssClass: 'bg-sanctification-custom' },
-        { name: 'Wunder (Gold)', value: 'miracle', cssClass: 'bg-miracle-custom' }, { name: 'Gottes Wirken (Himmelblau)', value: 'gods_work', cssClass: 'bg-gods-work-custom' },
-        { name: 'Gesetz (Schiefergrau)', value: 'law', cssClass: 'bg-law-custom' }, { name: 'Weisheit/Lehre (Flieder)', value: 'wisdom', cssClass: 'bg-wisdom-custom' },
-        { name: 'Anbetung/Gebet (Pfirsich)', value: 'worship', cssClass: 'bg-worship-custom' }, { name: 'Bund (Weinrot)', value: 'covenant', cssClass: 'bg-covenant-custom' },
-        { name: 'Unklar (Grau)', value: 'gray', cssClass: 'bg-gray-custom' }, { name: 'Entfernen', value: 'remove_color', cssClass: 'remove-color-swatch' }
+        { name: 'Christus im AT (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, 
+        { name: 'Ermutigung, Trost & Hoffnung (Grün)', value: 'green', cssClass: 'bg-green-custom' },
+        { name: 'Gebot & Weisung (Blau)', value: 'blue', cssClass: 'bg-blue-custom' }, 
+        { name: 'Sünde, Warnung & Gericht (Rot)', value: 'red', cssClass: 'bg-red-custom' },
+        { name: 'Prophetie & Erfüllung (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, 
+        { name: 'Geschichte & Kontext (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
+        { name: 'Gleichnis, Lehre & Weißheit (Türkis)', value: 'parable', cssClass: 'bg-parable-custom' }, 
+        { name: 'Zurechtweisung & Umkehr (Lavendel)', value: 'rebuke', cssClass: 'bg-rebuke-custom' },
+        { name: 'Israel & Gottes Volk (Oliv)', value: 'name', cssClass: 'bg-name-custom' }, 
+        { name: 'Heiligung, Erkenntnis & Wachstum (Rosé)', value: 'sanctification', cssClass: 'bg-sanctification-custom' },
+        { name: 'Christus Verheißung, Werke & Wort (Gold)', value: 'miracle', cssClass: 'bg-miracle-custom' }, 
+        { name: 'Gottes Wesen, Wirken & Wunder (Himmelblau)', value: 'gods_work', cssClass: 'bg-gods-work-custom' },
+        { name: 'Gesetz & Alter Bund (Schiefergrau)', value: 'law', cssClass: 'bg-law-custom' }, 
+        { name: 'Weisheit & Lehre (Flieder)', value: 'wisdom', cssClass: 'bg-wisdom-custom' },
+        { name: 'Anbetung, Gebet & Lobpreis (Pfirsich)', value: 'worship', cssClass: 'bg-worship-custom' }, 
+        { name: 'Neuer Bund (Weinrot)', value: 'covenant', cssClass: 'bg-covenant-custom' },
+        { name: 'Menschliche Natur & Zustand (Grau)', value: 'gray', cssClass: 'bg-gray-custom' }, 
+        { name: 'Entfernen', value: 'remove_color', cssClass: 'remove-color-swatch' }
     ];
 
     const colorPickerHtml = `
         <div class="popover-color-picker">
             ${highlightColors.map(color => {
-                const displayName = color.name.split(' (')[0];
-                return `
+        const displayName = color.name.split(' (')[0];
+        return `
                     <div class="popover-color-item" title="${color.name}" onclick="event.preventDefault(); handleColorHighlight(${globalId}, '${color.value}')">
                         <div class="popover-color-swatch ${color.cssClass}"></div>
                         <div class="popover-color-name">${displayName}</div>
                     </div>
                 `;
-            }).join('')}
+    }).join('')}
         </div>
     `;
 
-    const isAlreadyImportant = verseElement.dataset.isImportant === 'true'; 
+    const isAlreadyImportant = verseElement.dataset.isImportant === 'true';
     const importantLinkText = isAlreadyImportant ? "Als 'wichtig' entfernen" : "Für mich wichtig markieren";
-    
+
     const actionsHtml = `
         <div class="list-group list-group-flush">
             ${colorPickerHtml}
@@ -178,17 +187,17 @@ function handleColorHighlight(globalVerseId, colorValue) {
         alert("Bitte zuerst einloggen, um farbliche Markierungen zu setzen.");
         return;
     }
-    
+
     if (colorValue !== 'remove_color') {
         localStorage.setItem('lastUsedColor', colorValue);
     }
-    
+
     const verseElement = document.querySelector(`.verse[data-global-id='${globalVerseId}']`);
     if (!verseElement) return;
 
     const colorMap = {
-        'yellow': 'bg-warning', 'green': 'bg-green-custom', 'blue': 'bg-blue-custom', 'red': 'bg-red-custom', 'orange': 'bg-orange-custom', 
-        'brown': 'bg-brown-custom', 'gray': 'bg-gray-custom', 'parable': 'bg-parable-custom', 'rebuke': 'bg-rebuke-custom', 'name': 'bg-name-custom', 
+        'yellow': 'bg-warning', 'green': 'bg-green-custom', 'blue': 'bg-blue-custom', 'red': 'bg-red-custom', 'orange': 'bg-orange-custom',
+        'brown': 'bg-brown-custom', 'gray': 'bg-gray-custom', 'parable': 'bg-parable-custom', 'rebuke': 'bg-rebuke-custom', 'name': 'bg-name-custom',
         'sanctification': 'bg-sanctification-custom', 'miracle': 'bg-miracle-custom', 'gods_work': 'bg-gods-work-custom', 'law': 'bg-law-custom',
         'wisdom': 'bg-wisdom-custom', 'worship': 'bg-worship-custom', 'covenant': 'bg-covenant-custom'
     };
@@ -209,22 +218,22 @@ function handleColorHighlight(globalVerseId, colorValue) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `action=${actionForServer}&global_verse_id=${globalVerseId}&color=${colorValue}` // user_id kommt aus Session im Backend
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status !== 'success') {
-            alert('Fehler beim Speichern der Markierung: ' + data.message);
-            // Bei Fehler: UI zurücksetzen
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                alert('Fehler beim Speichern der Markierung: ' + data.message);
+                // Bei Fehler: UI zurücksetzen
+                if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
+                if (oldColorClass) verseElement.classList.add(oldColorClass);
+            }
+            // Kein window.location.reload(); für besseres Nutzererlebnis
+        })
+        .catch(error => {
+            console.error('Farb-Update-Fehler:', error);
+            alert('Kommunikationsfehler beim Speichern der Markierung.');
             if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
             if (oldColorClass) verseElement.classList.add(oldColorClass);
-        }
-        // Kein window.location.reload(); für besseres Nutzererlebnis
-    })
-    .catch(error => {
-        console.error('Farb-Update-Fehler:', error);
-        alert('Kommunikationsfehler beim Speichern der Markierung.');
-        if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
-        if (oldColorClass) verseElement.classList.add(oldColorClass);
-    });
+        });
 }
 
 
@@ -266,37 +275,37 @@ function handleMarkAsImportant(globalVerseId) {
         verseElement.classList.remove('user-important-verse-text');
         verseElement.dataset.isImportant = 'false';
     }
-    
+
     fetch('ajax_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `action=${actionForServer}&global_verse_id=${globalVerseId}` // user_id kommt aus Session
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status !== 'success') {
-            alert('Fehler: ' + data.message);
-            // Rollback UI
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                alert('Fehler: ' + data.message);
+                // Rollback UI
+                verseElement.classList.toggle('user-important-verse-text', wasImportant);
+                verseElement.dataset.isImportant = wasImportant.toString();
+                existingStar = verseElement.querySelector('i.' + starIconClass);
+                if (wasImportant && !existingStar) {
+                    const starIcon = document.createElement('i'); /* ... Stern wiederherstellen ... */
+                } else if (!wasImportant && existingStar) {
+                    if (existingStar.previousSibling && existingStar.previousSibling.nodeType === Node.TEXT_NODE) existingStar.previousSibling.remove();
+                    existingStar.remove(); /* ... Stern entfernen ... */
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Wichtig-Update-Fehler:', error);
+            alert('Kommunikationsfehler beim Speichern der "Wichtig"-Markierung.');
+            // Kompletter Rollback
             verseElement.classList.toggle('user-important-verse-text', wasImportant);
             verseElement.dataset.isImportant = wasImportant.toString();
             existingStar = verseElement.querySelector('i.' + starIconClass);
-            if (wasImportant && !existingStar) {
-                 const starIcon = document.createElement('i'); /* ... Stern wiederherstellen ... */ 
-            } else if (!wasImportant && existingStar) {
-                 if (existingStar.previousSibling && existingStar.previousSibling.nodeType === Node.TEXT_NODE) existingStar.previousSibling.remove();
-                 existingStar.remove(); /* ... Stern entfernen ... */
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Wichtig-Update-Fehler:', error);
-        alert('Kommunikationsfehler beim Speichern der "Wichtig"-Markierung.');
-        // Kompletter Rollback
-        verseElement.classList.toggle('user-important-verse-text', wasImportant);
-        verseElement.dataset.isImportant = wasImportant.toString();
-        existingStar = verseElement.querySelector('i.' + starIconClass);
-         if (wasImportant && !existingStar) { /* ... Stern wiederherstellen ... */ } else if (!wasImportant && existingStar) { /* ... Stern entfernen ... */ }
-    });
+            if (wasImportant && !existingStar) { /* ... Stern wiederherstellen ... */ } else if (!wasImportant && existingStar) { /* ... Stern entfernen ... */ }
+        });
 }
 
 function handleCompareVerse(globalVerseId, bookChapterTitleText, verseNumText) {
@@ -351,7 +360,7 @@ function submitNewCommentFromModal(globalVerseId, bookChapterTitleText, verseNum
 function initializeModalLikeButtonLogic() {
     const commentsModalElement = document.getElementById('commentsModal');
     if (!commentsModalElement) return;
-    commentsModalElement.addEventListener('click', function(event) {
+    commentsModalElement.addEventListener('click', function (event) {
         const likeButton = event.target.closest('.like-comment-btn-modal');
         if (!likeButton) return;
         event.preventDefault();
@@ -363,22 +372,22 @@ function initializeModalLikeButtonLogic() {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `action=like_comment&note_id=${noteId}` // user_id kommt aus Session
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const likeCountSpan = likeButton.querySelector('.like-count');
-                const heartIcon = likeButton.querySelector('i.bi');
-                if (likeCountSpan) likeCountSpan.textContent = data.like_count;
-                if (heartIcon) {
-                    const isLiked = data.action_taken === 'liked';
-                    heartIcon.classList.toggle('bi-heart-fill', isLiked);
-                    heartIcon.classList.toggle('text-danger', isLiked);
-                    heartIcon.classList.toggle('bi-heart', !isLiked);
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const likeCountSpan = likeButton.querySelector('.like-count');
+                    const heartIcon = likeButton.querySelector('i.bi');
+                    if (likeCountSpan) likeCountSpan.textContent = data.like_count;
+                    if (heartIcon) {
+                        const isLiked = data.action_taken === 'liked';
+                        heartIcon.classList.toggle('bi-heart-fill', isLiked);
+                        heartIcon.classList.toggle('text-danger', isLiked);
+                        heartIcon.classList.toggle('bi-heart', !isLiked);
+                    }
+                } else {
+                    alert(data.message || 'Ein Fehler ist aufgetreten.');
                 }
-            } else {
-                alert(data.message || 'Ein Fehler ist aufgetreten.');
-            }
-        }).catch(error => console.error('Fehler beim Liken im Modal:', error));
+            }).catch(error => console.error('Fehler beim Liken im Modal:', error));
     });
 }
 
@@ -395,10 +404,10 @@ function initializeCommentPageLogic() {
             loadComments(1);
         });
     }
-    
+
     const myCommentsCheckbox = document.getElementById('my_comments');
     if (myCommentsCheckbox) {
-        myCommentsCheckbox.addEventListener('change', function() {
+        myCommentsCheckbox.addEventListener('change', function () {
             loadComments(1); // Bei Änderung der Checkbox neu laden
         });
     }
@@ -454,8 +463,8 @@ function loadComments(page = 1) {
     const container = document.getElementById('commentListContainer');
     const paginationContainer = document.getElementById('commentPagination');
     if (!container || !paginationContainer) {
-         console.log("Container für Kommentare oder Pagination nicht gefunden auf dieser Seite.");
-         return;
+        console.log("Container für Kommentare oder Pagination nicht gefunden auf dieser Seite.");
+        return;
     }
 
     const form = document.getElementById('filterCommentsForm');
@@ -473,7 +482,7 @@ function loadComments(page = 1) {
 
 
     container.innerHTML = '<p class="text-center">Lade Kommentare...</p>';
-    paginationContainer.innerHTML = ''; 
+    paginationContainer.innerHTML = '';
 
     fetch(`ajax_handler.php?action=get_all_comments&${params.toString()}`)
         .then(response => response.json())
@@ -502,7 +511,7 @@ function renderCommentsOverview(comments, container) {
         const commentDateRaw = comment.updated_at && comment.updated_at !== '0000-00-00 00:00:00' ? comment.updated_at : comment.note_date;
         const commentDate = new Date(commentDateRaw).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         const datePrefix = comment.updated_at && comment.updated_at !== '0000-00-00 00:00:00' && comment.updated_at !== comment.note_date ? 'Bearbeitet am' : 'Erstellt am';
-        
+
         const heartIcon = comment.user_liked ? 'bi-heart-fill text-danger' : 'bi-heart';
 
         html += `
@@ -554,7 +563,7 @@ function renderPaginationOverview(pagination, container) {
     html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Zurück">‹</a>
              </li>`;
-    
+
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -593,23 +602,23 @@ function handleLikeCommentOverview(noteId, buttonElement) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `action=like_comment&note_id=${noteId}` // user_id kommt aus Session
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success' && buttonElement) {
-            const likeCountSpan = buttonElement.querySelector('.like-count');
-            const heartIcon = buttonElement.querySelector('i.bi');
-            if (likeCountSpan) likeCountSpan.textContent = data.like_count;
-            if (heartIcon) {
-                const isLiked = data.action_taken === 'liked';
-                heartIcon.classList.toggle('bi-heart-fill', isLiked);
-                heartIcon.classList.toggle('text-danger', isLiked); // text-danger für gefülltes Herz
-                heartIcon.classList.toggle('bi-heart', !isLiked);
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && buttonElement) {
+                const likeCountSpan = buttonElement.querySelector('.like-count');
+                const heartIcon = buttonElement.querySelector('i.bi');
+                if (likeCountSpan) likeCountSpan.textContent = data.like_count;
+                if (heartIcon) {
+                    const isLiked = data.action_taken === 'liked';
+                    heartIcon.classList.toggle('bi-heart-fill', isLiked);
+                    heartIcon.classList.toggle('text-danger', isLiked); // text-danger für gefülltes Herz
+                    heartIcon.classList.toggle('bi-heart', !isLiked);
+                }
+            } else {
+                alert(data.message || "Fehler beim Liken.");
             }
-        } else {
-            alert(data.message || "Fehler beim Liken.");
-        }
-    })
-    .catch(error => console.error("Fehler beim Liken auf Übersichtsseite:", error));
+        })
+        .catch(error => console.error("Fehler beim Liken auf Übersichtsseite:", error));
 }
 
 function openEditCommentModalOverview(noteId, currentText) {
@@ -628,16 +637,16 @@ function handleUpdateCommentOverview(noteId, newText) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `action=update_comment&note_id=${noteId}&note_text=${encodeURIComponent(newText)}` // user_id aus Session
     })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.status === 'success') {
-            bootstrap.Modal.getInstance(document.getElementById('editCommentModal'))?.hide();
-            const commentTextElement = document.querySelector(`.comment-text-${noteId}`);
-            if (commentTextElement) commentTextElement.innerHTML = nl2br(htmlspecialchars(newText));
-        }
-    })
-    .catch(error => console.error("Fehler beim Aktualisieren des Kommentars:", error));
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === 'success') {
+                bootstrap.Modal.getInstance(document.getElementById('editCommentModal'))?.hide();
+                const commentTextElement = document.querySelector(`.comment-text-${noteId}`);
+                if (commentTextElement) commentTextElement.innerHTML = nl2br(htmlspecialchars(newText));
+            }
+        })
+        .catch(error => console.error("Fehler beim Aktualisieren des Kommentars:", error));
 }
 
 function handleDeleteCommentOverview(noteId) {
@@ -647,26 +656,26 @@ function handleDeleteCommentOverview(noteId) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `action=delete_comment&note_id=${noteId}` // user_id aus Session
     })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.status === 'success') {
-            const commentItem = document.getElementById(`comment-item-${noteId}`);
-            if (commentItem) commentItem.remove();
-            // Optional: Prüfen ob die Seite jetzt leer ist und ggf. loadComments() für die vorherige Seite aufrufen
-        }
-    })
-    .catch(error => console.error("Fehler beim Löschen des Kommentars:", error));
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === 'success') {
+                const commentItem = document.getElementById(`comment-item-${noteId}`);
+                if (commentItem) commentItem.remove();
+                // Optional: Prüfen ob die Seite jetzt leer ist und ggf. loadComments() für die vorherige Seite aufrufen
+            }
+        })
+        .catch(error => console.error("Fehler beim Löschen des Kommentars:", error));
 }
 
 
 // --- PWA Service Worker ---
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(registration => {
-      console.log('ServiceWorker registriert mit Scope:', registration.scope);
-    }).catch(error => {
-      console.log('ServiceWorker Registrierung fehlgeschlagen:', error);
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('ServiceWorker registriert mit Scope:', registration.scope);
+        }).catch(error => {
+            console.log('ServiceWorker Registrierung fehlgeschlagen:', error);
+        });
     });
-  });
 }

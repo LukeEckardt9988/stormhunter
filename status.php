@@ -14,23 +14,23 @@ require_once 'header.php';
 // Die HEX-Codes sollten den tatsächlichen Hintergrundfarben Ihrer .bg-*-custom Klassen entsprechen.
 $highlightColorsPHP = [
     // Diese HEX-Werte sind Beispiele und MÜSSEN an Ihre `styles.css` angepasst werden!
-    'yellow' => ['name' => 'Wichtig',        'hex' => '#ffe082'], // bg-warning
-    'green'  => ['name' => 'Ermutigung & Trost',     'hex' => '#a5d6a7'], // bg-green-custom
-    'blue'   => ['name' => 'Gebot',          'hex' => '#90caf9'], // bg-blue-custom
-    'red'    => ['name' => 'Sünde/Warnung',  'hex' => '#ef9a9a'], // bg-red-custom
-    'orange' => ['name' => 'Verheißung & Prophetie',      'hex' => '#ffcc80'], // bg-orange-custom
-    'brown'  => ['name' => 'Geschichte',     'hex' => '#d2b48c'], // bg-brown-custom
-    'parable' => ['name' => 'Gleichnis',      'hex' => '#a0e6d7'], // bg-parable-custom
-    'rebuke' => ['name' => 'Zurechtweisung', 'hex' => '#d1c4e9'], // bg-rebuke-custom
-    'name'   => ['name' => 'Namen/Orte',   'hex' => '#e6ee9c'], // bg-name-custom
-    'sanctification' => ['name' => 'Heiligung', 'hex' => '#f8bbd0'], // bg-sanctification-custom
-    'miracle' => ['name' => 'Wunder',         'hex' => '#fff59d'], // bg-miracle-custom
-    'gods_work' => ['name' => 'Gottes Wirken',  'hex' => '#81d4fa'], // bg-gods-work-custom
-    'law'    => ['name' => 'Gesetz',         'hex' => '#b0bec5'], // bg-law-custom
-    'wisdom' => ['name' => 'Weisheit/Lehre', 'hex' => '#c5cae9'], // bg-wisdom-custom
-    'worship' => ['name' => 'Anbetung/Gebet', 'hex' => '#ffccbc'], // bg-worship-custom
-    'covenant' => ['name' => 'Bund',           'hex' => '#e4a788'], // bg-covenant-custom (Beispiel, anpassen!)
-    'gray'   => ['name' => 'Unklar',         'hex' => '#d6d8db']  // bg-gray-custom
+    'yellow' => ['name' => 'Christus im AT', 'hex' => '#ffe082'], // bg-warning
+    'green'  => ['name' => 'Ermutigung, Trost & Hoffnung', 'hex' => '#a5d6a7'], // bg-green-custom
+    'blue'   => ['name' => 'Gebot & Weisung', 'hex' => '#90caf9'], // bg-blue-custom
+    'red'    => ['name' => 'Sünde, Warnung & Gericht', 'hex' => '#ef9a9a'], // bg-red-custom
+    'orange' => ['name' => 'Prophetie & Erfüllung', 'hex' => '#ffcc80'], // bg-orange-custom
+    'brown'  => ['name' => 'Geschichte & Kontext', 'hex' => '#d2b48c'], // bg-brown-custom
+    'parable' => ['name' => 'Gleichnis, Lehre & Weißheit', 'hex' => '#a0e6d7'], // bg-parable-custom
+    'rebuke' => ['name' => 'Zurechtweisung & Umkehr', 'hex' => '#d1c4e9'], // bg-rebuke-custom
+    'name'   => ['name' => 'Israel & Gottes Volk', 'hex' => '#e6ee9c'], // bg-name-custom
+    'sanctification' => ['name' => 'Heiligung, Erkenntnis & Wachstum', 'hex' => '#f8bbd0'], // bg-sanctification-custom
+    'miracle' => ['name' => 'Christus Verheißung, Werke & Wort', 'hex' => '#fff59d'], // bg-miracle-custom
+    'gods_work' => ['name' => 'Gottes Wesen, Wirken & Wunder', 'hex' => '#81d4fa'], // bg-gods-work-custom
+    'law'    => ['name' => 'Gesetz & Alter Bund', 'hex' => '#b0bec5'], // bg-law-custom
+    'wisdom' => ['name' => 'Weisheit & Lehre', 'hex' => '#c5cae9'], // bg-wisdom-custom
+    'worship' => ['name' => 'Anbetung, Gebet & Lobpreis', 'hex' => '#ffccbc'], // bg-worship-custom
+    'covenant' => ['name' => 'Neuer Bund', 'hex' => '#e4a788'], // bg-covenant-custom (Beispiel, anpassen!)
+    'gray'   => ['name' => 'Menschliche Natur & Zustand', 'hex' => '#d6d8db']  // bg-gray-custom
 ];
 
 ?>

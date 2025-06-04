@@ -30,19 +30,19 @@ require_once 'header.php';
     <?php if (empty($newsArticlesInitial) && (!defined('NEWS_ADMIN_USER_ID') || $loggedInUserId !== NEWS_ADMIN_USER_ID)): ?>
         <div class="alert alert-info text-center">Momentan gibt es keine neuen Beiträge. Schauen Sie bald wieder vorbei!</div>
     <?php elseif (empty($newsArticlesInitial) && (defined('NEWS_ADMIN_USER_ID') && $loggedInUserId === NEWS_ADMIN_USER_ID)): ?>
-         <div class="alert alert-info text-center">
+        <div class="alert alert-info text-center">
             Noch keine Beiträge vorhanden. <a href="create_news_post.php" class="alert-link">Jetzt ersten Beitrag erstellen!</a>
         </div>
     <?php else: ?>
         <div class="row row-cols-1 row-cols-md-2 g-4" id="newsFeedContainer">
             <?php foreach ($newsArticlesInitial as $article): ?>
                 <?php
-                    // Verwende die Hilfsfunktion für die Vorschau-Teile
-                    $preview_elements = get_article_preview_elements($pdo, $article['article_id'], $article['title']);
+                $preview_elements = get_article_preview_elements($pdo, $article['article_id'], $article['title']);
                 ?>
                 <div class="col">
-                    <div class="card h-100 shadow-sm news-article-card"> 
-                        <?php echo $preview_elements['image_html']; // Gibt das Bild aus, wenn vorhanden ?>
+                    <div class="card h-100 shadow-sm news-article-card">
+                        <?php echo $preview_elements['media_html']; // Hier wird jetzt Bild ODER Video ausgegeben 
+                        ?>
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title"><?php echo htmlspecialchars($article['title']); ?></h5>
                             <small class="text-muted mb-2">
@@ -50,7 +50,7 @@ require_once 'header.php';
                                 von <?php echo htmlspecialchars($article['author_username']); ?>
                             </small>
                             <div class="article-text-preview mb-3 flex-grow-1">
-                                <?php echo $preview_elements['text_html']; // Gibt den Vorschautext mit korrektem "Weiterlesen"-Link aus ?>
+                                <?php echo $preview_elements['text_html']; ?>
                             </div>
                         </div>
                     </div>
@@ -65,6 +65,7 @@ require_once 'header.php';
     <?php endif; ?>
 </div>
 
-<?php // Das Modal #newsArticleModal wird nicht mehr benötigt und kann aus dieser Datei entfernt werden. ?>
+<?php // Das Modal #newsArticleModal wird nicht mehr benötigt und kann aus dieser Datei entfernt werden. 
+?>
 
 <?php require_once 'footer.php'; ?>

@@ -1,18 +1,18 @@
 // sw.js
 
-const CACHE_NAME = 'bibel-app-cache-v4'; // NEUE VERSION HIER! (z.B. von v3 auf v4)
+const CACHE_NAME = 'bibel-app-cache-v7'; 
 
 // Liste der Dateien, die immer gecacht werden sollen (die "App-Hülle")
 const urlsToCache = [
   '/',                        // Deine Startseite (oft index.php)
   '/index.php',               // Explizit, falls unterschiedlich zu '/'
-  '/dashboard.php',           // Wichtige, geänderte Seite
+  //'/dashboard.php',           // Wichtige, geänderte Seite
   // '/news_article.php',     // Die *Grundstruktur* der Artikelseite, falls gewünscht.
                               // Die individuellen Artikel selbst werden nicht hier gecacht.
 
   // Cache-Busting für geänderte Assets:
   '/styles.css?v=3',          // Erhöhe Version, wenn styles.css geändert wurde
-  '/app.js?v=4',              // Erhöhe Version, wenn app.js geändert wurde
+  '/app.js?v=5',              // Erhöhe Version, wenn app.js geändert wurde
   '/dashboard.js?v=1',        // Erhöhe Version, wenn dashboard.js geändert wurde (oder v=1 wenn neu)
   // '/helpers.php',          // PHP-Dateien, die nur via include genutzt werden, müssen NICHT hier rein.
                               // Deren Änderungen wirken sich auf die PHP-Seiten aus, die sie includen (z.B. dashboard.php)

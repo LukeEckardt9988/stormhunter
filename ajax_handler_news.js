@@ -43,7 +43,7 @@ if ($action) {
                         $preview_elements = get_article_preview_elements($pdo, $article['article_id'], $article['title']);
 
                         $articles_html .= '<div class="col"><div class="card h-100 shadow-sm news-article-card">';
-                        $articles_html .= $preview_elements['image_html']; // Fügt das Bild ein, wenn vorhanden
+                        $articles_html .= $preview_elements['media_html']; // Hier Bild ODER Video
                         $articles_html .= '<div class="card-body d-flex flex-column">';
                         $articles_html .= '<h5 class="card-title">'.htmlspecialchars($article['title']).'</h5>';
                         $articles_html .= '<small class="text-muted mb-2"><i class="bi bi-calendar3"></i> '.date("d.m.Y", strtotime($article['created_at'])).' von '.htmlspecialchars($article['author_username']).'</small>';
