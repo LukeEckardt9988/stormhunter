@@ -272,9 +272,12 @@ require_once 'header.php';
                 $highlightClass = '';
                 if ($highlightColorValue) {
                     // NEU: Angepasste switch-Anweisung
+               
+                    // KORRIGIERT: Angepasste switch-Anweisung
                     switch ($highlightColorValue) {
                         case 'god':               $highlightClass = 'bg-gods-work-custom'; break;
-                        case 'christ_prophecy':   $highlightClass = 'bg-warning'; break;
+                        case 'christ_ot':         $highlightClass = 'bg-warning'; break;
+                        case 'prophecy_general':  $highlightClass = 'bg-orange-custom'; break;
                         case 'christ_teaching':   $highlightClass = 'bg-miracle-custom'; break;
                         case 'sin_repentance':    $highlightClass = 'bg-red-custom'; break;
                         case 'law_covenant':      $highlightClass = 'bg-law-custom'; break;
@@ -286,7 +289,6 @@ require_once 'header.php';
                         case 'worship':           $highlightClass = 'bg-worship-custom'; break;
                         case 'people_church':     $highlightClass = 'bg-name-custom'; break;
                         case 'history':           $highlightClass = 'bg-brown-custom'; break;
-                        // Alte Klassen sind nicht mehr nötig nach der Migration
                     }
                 }
                 $importantClass = $verse['is_important_for_user'] ? 'user-important-verse-text' : '';

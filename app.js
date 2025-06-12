@@ -117,18 +117,20 @@ function showVerseActionsInModal(verseElement) {
     modalTitle.textContent = `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`;
 
     // NEU: Konsolidiertes Array für die Farbauswahl
+     // KORRIGIERT: Array für die Farbauswahl
     const highlightColors = [
         { name: 'Gottes Wesen', value: 'god', cssClass: 'bg-gods-work-custom' },
-        { name: 'Christus: Prophetie', value: 'christ_prophecy', cssClass: 'bg-warning' },
+        { name: 'Christus im AT', value: 'christ_ot', cssClass: 'bg-warning' },
+        { name: 'Prophetie', value: 'prophecy_general', cssClass: 'bg-orange-custom' },
         { name: 'Christus: Lehre', value: 'christ_teaching', cssClass: 'bg-miracle-custom' },
-        { name: 'Sünde & Umkehr', value: 'sin_repentance', cssClass: 'bg-red-custom' },
-        { name: 'Gesetz & Bund', value: 'law_covenant', cssClass: 'bg-law-custom' },
-        { name: 'Glaube & Erlösung', value: 'faith_salvation', cssClass: 'bg-sanctification-custom' },
-        { name: 'Heiliger Geist', value: 'holy_spirit', cssClass: 'bg-parable-custom' },
-        { name: 'Gebote & Ethik', value: 'commandments', cssClass: 'bg-blue-custom' },
+        { name: 'Sünde/Umkehr', value: 'sin_repentance', cssClass: 'bg-red-custom' },
+        { name: 'Gesetz/Bund', value: 'law_covenant', cssClass: 'bg-law-custom' },
+        { name: 'Glaube/Erlösung', value: 'faith_salvation', cssClass: 'bg-sanctification-custom' },
+        { name: 'Hl. Geist', value: 'holy_spirit', cssClass: 'bg-parable-custom' },
+        { name: 'Gebote/Ethik', value: 'commandments', cssClass: 'bg-blue-custom' },
         { name: 'Hoffnung', value: 'hope', cssClass: 'bg-green-custom' },
         { name: 'Wachstum', value: 'growth', cssClass: 'bg-rebuke-custom' },
-        { name: 'Anbetung & Gebet', value: 'worship', cssClass: 'bg-worship-custom' },
+        { name: 'Anbetung/Gebet', value: 'worship', cssClass: 'bg-worship-custom' },
         { name: 'Gottes Volk', value: 'people_church', cssClass: 'bg-name-custom' },
         { name: 'Geschichte', value: 'history', cssClass: 'bg-brown-custom' },
         { name: 'Entfernen', value: 'remove_color', cssClass: 'remove-color-swatch' }
@@ -191,11 +193,11 @@ function handleColorHighlight(globalVerseId, colorValue) {
 
     // NEU: Neue colorMap
     const colorMap = {
-        'god': 'bg-gods-work-custom', 'christ_prophecy': 'bg-warning', 'christ_teaching': 'bg-miracle-custom',
-        'sin_repentance': 'bg-red-custom', 'law_covenant': 'bg-law-custom', 'faith_salvation': 'bg-sanctification-custom',
-        'holy_spirit': 'bg-parable-custom', 'commandments': 'bg-blue-custom', 'hope': 'bg-green-custom',
-        'growth': 'bg-rebuke-custom', 'worship': 'bg-worship-custom', 'people_church': 'bg-name-custom',
-        'history': 'bg-brown-custom'
+        'god': 'bg-gods-work-custom', 'christ_ot': 'bg-warning', 'prophecy_general': 'bg-orange-custom', 
+        'christ_teaching': 'bg-miracle-custom', 'sin_repentance': 'bg-red-custom', 'law_covenant': 'bg-law-custom', 
+        'faith_salvation': 'bg-sanctification-custom', 'holy_spirit': 'bg-parable-custom', 'commandments': 'bg-blue-custom', 
+        'hope': 'bg-green-custom', 'growth': 'bg-rebuke-custom', 'worship': 'bg-worship-custom', 
+        'people_church': 'bg-name-custom', 'history': 'bg-brown-custom'
     };
 
     // Alte Klassen entfernen

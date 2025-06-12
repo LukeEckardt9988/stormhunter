@@ -12,81 +12,59 @@ require_once 'header.php';
 // NEU: Definition der konsolidierten Farbmarkierungen
 $colorLegend = [
     [
-        'name' => 'Gottes Wesen & Handeln',
-        'value' => 'god',
-        'cssClass' => 'bg-gods-work-custom',
+        'name' => 'Gottes Wesen & Handeln', 'value' => 'god', 'cssClass' => 'bg-gods-work-custom',
         'description' => 'Alles über Gottes Charakter, seine Eigenschaften, sein souveränes Wirken, die Schöpfung und seine Wunder.'
     ],
     [
-        'name' => 'Christus: Person & Prophetie',
-        'value' => 'christ_prophecy',
-        'cssClass' => 'bg-warning',
-        'description' => 'Verse über die Identität, Natur und Göttlichkeit Jesu. Beinhaltet Prophetien und typologische Hinweise auf ihn im AT.'
+        'name' => 'Christus im AT', 'value' => 'christ_ot', 'cssClass' => 'bg-warning',
+        'description' => 'Verse, die durch Prophetie, Bilder (Typologie) oder direkte Aussagen auf Jesus Christus im Alten Testament hinweisen.'
     ],
     [
-        'name' => 'Christus: Lehre & Wirken',
-        'value' => 'christ_teaching',
-        'cssClass' => 'bg-miracle-custom',
+        'name' => 'Prophetie & Gericht', 'value' => 'prophecy_general', 'cssClass' => 'bg-orange-custom',
+        'description' => 'Allgemeine Weissagungen, Gerichtsankündigungen und prophetische Worte, die sich auf Völker, Personen oder zukünftige Ereignisse beziehen.'
+    ],
+    [
+        'name' => 'Christus: Lehre & Wirken', 'value' => 'christ_teaching', 'cssClass' => 'bg-miracle-custom',
         'description' => 'Die Worte, Lehren, Gleichnisse und Taten/Wunder von Jesus während seines irdischen Dienstes.'
     ],
     [
-        'name' => 'Sünde & Umkehr',
-        'value' => 'sin_repentance',
-        'cssClass' => 'bg-red-custom',
+        'name' => 'Sünde & Umkehr', 'value' => 'sin_repentance', 'cssClass' => 'bg-red-custom',
         'description' => 'Verse über Sünde, menschliches Versagen, Warnungen vor dem Gericht, aber auch über Buße, Umkehr und Vergebung.'
     ],
     [
-        'name' => 'Gesetz & Bund',
-        'value' => 'law_covenant',
-        'cssClass' => 'bg-law-custom',
+        'name' => 'Gesetz & Bund', 'value' => 'law_covenant', 'cssClass' => 'bg-law-custom',
         'description' => 'Bezieht sich auf den Alten und Neuen Bund, die Zehn Gebote, das mosaische Gesetz und dessen Erfüllung in Christus.'
     ],
     [
-        'name' => 'Glaube & Erlösung',
-        'value' => 'faith_salvation',
-        'cssClass' => 'bg-sanctification-custom',
+        'name' => 'Glaube & Erlösung', 'value' => 'faith_salvation', 'cssClass' => 'bg-sanctification-custom',
         'description' => 'Zentrale Verse über Erlösung allein aus Gnade durch Glauben, Rechtfertigung und die Kernbotschaft des Evangeliums.'
     ],
      [
-        'name' => 'Heiliger Geist',
-        'value' => 'holy_spirit',
-        'cssClass' => 'bg-parable-custom',
+        'name' => 'Heiliger Geist', 'value' => 'holy_spirit', 'cssClass' => 'bg-parable-custom',
         'description' => 'Verse, die sich auf die Person, das Wirken, die Gaben und die Frucht des Heiligen Geistes beziehen.'
     ],
     [
-        'name' => 'Gebote & Ethik',
-        'value' => 'commandments',
-        'cssClass' => 'bg-blue-custom',
+        'name' => 'Gebote & Ethik', 'value' => 'commandments', 'cssClass' => 'bg-blue-custom',
         'description' => 'Klare Anweisungen, ethische Weisungen und Gebote für ein gottgefälliges Leben.'
     ],
     [
-        'name' => 'Ermutigung & Hoffnung',
-        'value' => 'hope',
-        'cssClass' => 'bg-green-custom',
+        'name' => 'Ermutigung & Hoffnung', 'value' => 'hope', 'cssClass' => 'bg-green-custom',
         'description' => 'Verse, die Trost, Hoffnung auf Gottes Zusagen und Ermutigung in allen Lebenslagen spenden.'
     ],
     [
-        'name' => 'Geistliches Wachstum',
-        'value' => 'growth',
-        'cssClass' => 'bg-rebuke-custom',
+        'name' => 'Geistliches Wachstum', 'value' => 'growth', 'cssClass' => 'bg-rebuke-custom',
         'description' => 'Aspekte der Heiligung, der Jüngerschaft und der praktischen Nachfolge im christlichen Leben.'
     ],
     [
-        'name' => 'Anbetung & Gebet',
-        'value' => 'worship',
-        'cssClass' => 'bg-worship-custom',
+        'name' => 'Anbetung & Gebet', 'value' => 'worship', 'cssClass' => 'bg-worship-custom',
         'description' => 'Psalmen, Gebete, Lobpreis, Anbetung und Ausdrücke der Dankbarkeit gegenüber Gott.'
     ],
     [
-        'name' => 'Gottes Volk & Gemeinde',
-        'value' => 'people_church',
-        'cssClass' => 'bg-name-custom',
+        'name' => 'Gottes Volk & Gemeinde', 'value' => 'people_church', 'cssClass' => 'bg-name-custom',
         'description' => 'Verse über Israel (AT) und die Gemeinde/Kirche (NT), deren Identität, Geschichte und Auftrag.'
     ],
     [
-        'name' => 'Geschichte & Kontext',
-        'value' => 'history',
-        'cssClass' => 'bg-brown-custom',
+        'name' => 'Geschichte & Kontext', 'value' => 'history', 'cssClass' => 'bg-brown-custom',
         'description' => 'Rein historische Berichte, Genealogien, kultureller und geografischer Kontext zum besseren Verständnis.'
     ],
 ];

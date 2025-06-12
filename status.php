@@ -17,7 +17,8 @@ require_once 'header.php';
 // NEU: PHP-Array der Farbinformationen für Chart.js
 $highlightColorsPHP = [
     'god'               => ['name' => 'Gottes Wesen & Handeln', 'hex' => '#81d4fa'],
-    'christ_prophecy'   => ['name' => 'Christus: Person & Prophetie', 'hex' => '#ffe082'],
+    'christ_ot'         => ['name' => 'Christus im AT', 'hex' => '#ffe082'],
+    'prophecy_general'  => ['name' => 'Prophetie & Gericht', 'hex' => '#ffcc80'],
     'christ_teaching'   => ['name' => 'Christus: Lehre & Wirken', 'hex' => '#fff59d'],
     'sin_repentance'    => ['name' => 'Sünde & Umkehr', 'hex' => '#ef9a9a'],
     'law_covenant'      => ['name' => 'Gesetz & Bund', 'hex' => '#b0bec5'],
@@ -29,7 +30,6 @@ $highlightColorsPHP = [
     'worship'           => ['name' => 'Anbetung & Gebet', 'hex' => '#ffccbc'],
     'people_church'     => ['name' => 'Gottes Volk & Gemeinde', 'hex' => '#e6ee9c'],
     'history'           => ['name' => 'Geschichte & Kontext', 'hex' => '#d2b48c'],
-    // Alte, nicht mehr verwendete Farben/Werte können hier entfernt werden.
 ];
 
 ?>
