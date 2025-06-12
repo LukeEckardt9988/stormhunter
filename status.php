@@ -12,25 +12,24 @@ require_once 'header.php';
 // PHP-Array der Farbinformationen (Namen und HEX-Codes für Chart.js)
 // Diese müssen exakt zu Ihren CSS-Klassen und den 'value' in app.js passen!
 // Die HEX-Codes sollten den tatsächlichen Hintergrundfarben Ihrer .bg-*-custom Klassen entsprechen.
+// Am Anfang von status.php
+
+// NEU: PHP-Array der Farbinformationen für Chart.js
 $highlightColorsPHP = [
-    // Diese HEX-Werte sind Beispiele und MÜSSEN an Ihre `styles.css` angepasst werden!
-    'yellow' => ['name' => 'Christus im AT', 'hex' => '#ffe082'], // bg-warning
-    'green'  => ['name' => 'Ermutigung, Trost & Hoffnung', 'hex' => '#a5d6a7'], // bg-green-custom
-    'blue'   => ['name' => 'Gebot & Weisung', 'hex' => '#90caf9'], // bg-blue-custom
-    'red'    => ['name' => 'Sünde, Warnung & Gericht', 'hex' => '#ef9a9a'], // bg-red-custom
-    'orange' => ['name' => 'Prophetie & Erfüllung', 'hex' => '#ffcc80'], // bg-orange-custom
-    'brown'  => ['name' => 'Geschichte & Kontext', 'hex' => '#d2b48c'], // bg-brown-custom
-    'parable' => ['name' => 'Gleichnis, Lehre & Weißheit', 'hex' => '#a0e6d7'], // bg-parable-custom
-    'rebuke' => ['name' => 'Zurechtweisung & Umkehr', 'hex' => '#d1c4e9'], // bg-rebuke-custom
-    'name'   => ['name' => 'Israel & Gottes Volk', 'hex' => '#e6ee9c'], // bg-name-custom
-    'sanctification' => ['name' => 'Heiligung, Erkenntnis & Wachstum', 'hex' => '#f8bbd0'], // bg-sanctification-custom
-    'miracle' => ['name' => 'Christus Verheißung, Werke & Wort', 'hex' => '#fff59d'], // bg-miracle-custom
-    'gods_work' => ['name' => 'Gottes Wesen, Wirken & Wunder', 'hex' => '#81d4fa'], // bg-gods-work-custom
-    'law'    => ['name' => 'Gesetz & Alter Bund', 'hex' => '#b0bec5'], // bg-law-custom
-    'wisdom' => ['name' => 'Weisheit & Lehre', 'hex' => '#c5cae9'], // bg-wisdom-custom
-    'worship' => ['name' => 'Anbetung, Gebet & Lobpreis', 'hex' => '#ffccbc'], // bg-worship-custom
-    'covenant' => ['name' => 'Neuer Bund', 'hex' => '#e4a788'], // bg-covenant-custom (Beispiel, anpassen!)
-    'gray'   => ['name' => 'Menschliche Natur & Zustand', 'hex' => '#d6d8db']  // bg-gray-custom
+    'god'               => ['name' => 'Gottes Wesen & Handeln', 'hex' => '#81d4fa'],
+    'christ_prophecy'   => ['name' => 'Christus: Person & Prophetie', 'hex' => '#ffe082'],
+    'christ_teaching'   => ['name' => 'Christus: Lehre & Wirken', 'hex' => '#fff59d'],
+    'sin_repentance'    => ['name' => 'Sünde & Umkehr', 'hex' => '#ef9a9a'],
+    'law_covenant'      => ['name' => 'Gesetz & Bund', 'hex' => '#b0bec5'],
+    'faith_salvation'   => ['name' => 'Glaube & Erlösung', 'hex' => '#f8bbd0'],
+    'holy_spirit'       => ['name' => 'Heiliger Geist', 'hex' => '#a0e6d7'],
+    'commandments'      => ['name' => 'Gebote & Ethik', 'hex' => '#90caf9'],
+    'hope'              => ['name' => 'Ermutigung & Hoffnung', 'hex' => '#a5d6a7'],
+    'growth'            => ['name' => 'Geistliches Wachstum', 'hex' => '#d1c4e9'],
+    'worship'           => ['name' => 'Anbetung & Gebet', 'hex' => '#ffccbc'],
+    'people_church'     => ['name' => 'Gottes Volk & Gemeinde', 'hex' => '#e6ee9c'],
+    'history'           => ['name' => 'Geschichte & Kontext', 'hex' => '#d2b48c'],
+    // Alte, nicht mehr verwendete Farben/Werte können hier entfernt werden.
 ];
 
 ?>

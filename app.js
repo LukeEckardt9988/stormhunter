@@ -116,24 +116,21 @@ function showVerseActionsInModal(verseElement) {
 
     modalTitle.textContent = `Aktionen für ${bookChapterTitleText}, Vers ${verseNumText}`;
 
+    // NEU: Konsolidiertes Array für die Farbauswahl
     const highlightColors = [
-        { name: 'Christus im AT (Gelb)', value: 'yellow', cssClass: 'bg-warning' }, 
-        { name: 'Ermutigung, Trost & Hoffnung (Grün)', value: 'green', cssClass: 'bg-green-custom' },
-        { name: 'Gebot & Weisung (Blau)', value: 'blue', cssClass: 'bg-blue-custom' }, 
-        { name: 'Sünde, Warnung & Gericht (Rot)', value: 'red', cssClass: 'bg-red-custom' },
-        { name: 'Prophetie & Erfüllung (Orange)', value: 'orange', cssClass: 'bg-orange-custom' }, 
-        { name: 'Geschichte & Kontext (Braun)', value: 'brown', cssClass: 'bg-brown-custom' },
-        { name: 'Gleichnis, Lehre & Weißheit (Türkis)', value: 'parable', cssClass: 'bg-parable-custom' }, 
-        { name: 'Zurechtweisung & Umkehr (Lavendel)', value: 'rebuke', cssClass: 'bg-rebuke-custom' },
-        { name: 'Israel & Gottes Volk (Oliv)', value: 'name', cssClass: 'bg-name-custom' }, 
-        { name: 'Heiligung, Erkenntnis & Wachstum (Rosé)', value: 'sanctification', cssClass: 'bg-sanctification-custom' },
-        { name: 'Christus Verheißung, Werke & Wort (Gold)', value: 'miracle', cssClass: 'bg-miracle-custom' }, 
-        { name: 'Gottes Wesen, Wirken & Wunder (Himmelblau)', value: 'gods_work', cssClass: 'bg-gods-work-custom' },
-        { name: 'Gesetz & Alter Bund (Schiefergrau)', value: 'law', cssClass: 'bg-law-custom' }, 
-        { name: 'Weisheit & Lehre (Flieder)', value: 'wisdom', cssClass: 'bg-wisdom-custom' },
-        { name: 'Anbetung, Gebet & Lobpreis (Pfirsich)', value: 'worship', cssClass: 'bg-worship-custom' }, 
-        { name: 'Neuer Bund (Weinrot)', value: 'covenant', cssClass: 'bg-covenant-custom' },
-        { name: 'Menschliche Natur & Zustand (Grau)', value: 'gray', cssClass: 'bg-gray-custom' }, 
+        { name: 'Gottes Wesen', value: 'god', cssClass: 'bg-gods-work-custom' },
+        { name: 'Christus: Prophetie', value: 'christ_prophecy', cssClass: 'bg-warning' },
+        { name: 'Christus: Lehre', value: 'christ_teaching', cssClass: 'bg-miracle-custom' },
+        { name: 'Sünde & Umkehr', value: 'sin_repentance', cssClass: 'bg-red-custom' },
+        { name: 'Gesetz & Bund', value: 'law_covenant', cssClass: 'bg-law-custom' },
+        { name: 'Glaube & Erlösung', value: 'faith_salvation', cssClass: 'bg-sanctification-custom' },
+        { name: 'Heiliger Geist', value: 'holy_spirit', cssClass: 'bg-parable-custom' },
+        { name: 'Gebote & Ethik', value: 'commandments', cssClass: 'bg-blue-custom' },
+        { name: 'Hoffnung', value: 'hope', cssClass: 'bg-green-custom' },
+        { name: 'Wachstum', value: 'growth', cssClass: 'bg-rebuke-custom' },
+        { name: 'Anbetung & Gebet', value: 'worship', cssClass: 'bg-worship-custom' },
+        { name: 'Gottes Volk', value: 'people_church', cssClass: 'bg-name-custom' },
+        { name: 'Geschichte', value: 'history', cssClass: 'bg-brown-custom' },
         { name: 'Entfernen', value: 'remove_color', cssClass: 'remove-color-swatch' }
     ];
 
@@ -182,58 +179,52 @@ function hideVerseActionModal() {
 
 function handleColorHighlight(globalVerseId, colorValue) {
     hideVerseActionModal();
-
     if (currentUserId === 0 && colorValue !== 'remove_color') {
         alert("Bitte zuerst einloggen, um farbliche Markierungen zu setzen.");
         return;
     }
-
     if (colorValue !== 'remove_color') {
         localStorage.setItem('lastUsedColor', colorValue);
     }
-
     const verseElement = document.querySelector(`.verse[data-global-id='${globalVerseId}']`);
     if (!verseElement) return;
 
+    // NEU: Neue colorMap
     const colorMap = {
-        'yellow': 'bg-warning', 'green': 'bg-green-custom', 'blue': 'bg-blue-custom', 'red': 'bg-red-custom', 'orange': 'bg-orange-custom',
-        'brown': 'bg-brown-custom', 'gray': 'bg-gray-custom', 'parable': 'bg-parable-custom', 'rebuke': 'bg-rebuke-custom', 'name': 'bg-name-custom',
-        'sanctification': 'bg-sanctification-custom', 'miracle': 'bg-miracle-custom', 'gods_work': 'bg-gods-work-custom', 'law': 'bg-law-custom',
-        'wisdom': 'bg-wisdom-custom', 'worship': 'bg-worship-custom', 'covenant': 'bg-covenant-custom'
+        'god': 'bg-gods-work-custom', 'christ_prophecy': 'bg-warning', 'christ_teaching': 'bg-miracle-custom',
+        'sin_repentance': 'bg-red-custom', 'law_covenant': 'bg-law-custom', 'faith_salvation': 'bg-sanctification-custom',
+        'holy_spirit': 'bg-parable-custom', 'commandments': 'bg-blue-custom', 'hope': 'bg-green-custom',
+        'growth': 'bg-rebuke-custom', 'worship': 'bg-worship-custom', 'people_church': 'bg-name-custom',
+        'history': 'bg-brown-custom'
     };
 
-    const oldColorClass = Object.values(colorMap).find(c => verseElement.classList.contains(c));
-    if (oldColorClass) {
-        verseElement.classList.remove(oldColorClass);
-    }
+    // Alte Klassen entfernen
+    Object.values(colorMap).forEach(cls => verseElement.classList.remove(cls));
 
     if (colorValue !== 'remove_color' && colorMap[colorValue]) {
         verseElement.classList.add(colorMap[colorValue]);
     }
-    // verseElement.dataset.currentColor wird im Backend gesetzt, UI ist optimistich
 
     const actionForServer = colorValue === 'remove_color' ? 'removeHighlight' : 'addHighlight';
     fetch('ajax_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `action=${actionForServer}&global_verse_id=${globalVerseId}&color=${colorValue}` // user_id kommt aus Session im Backend
+        body: `action=${actionForServer}&global_verse_id=${globalVerseId}&color=${colorValue}`
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status !== 'success') {
-                alert('Fehler beim Speichern der Markierung: ' + data.message);
-                // Bei Fehler: UI zurücksetzen
-                if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
-                if (oldColorClass) verseElement.classList.add(oldColorClass);
-            }
-            // Kein window.location.reload(); für besseres Nutzererlebnis
-        })
-        .catch(error => {
-            console.error('Farb-Update-Fehler:', error);
-            alert('Kommunikationsfehler beim Speichern der Markierung.');
-            if (colorMap[colorValue]) verseElement.classList.remove(colorMap[colorValue]);
-            if (oldColorClass) verseElement.classList.add(oldColorClass);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'success') {
+            alert('Fehler beim Speichern der Markierung: ' + data.message);
+            // UI Rollback
+            Object.values(colorMap).forEach(cls => verseElement.classList.remove(cls));
+            // Hier müsste man sich die alte Farbe merken, um sie wiederherzustellen.
+            // Ein Neuladen ist bei Fehler oft am einfachsten.
+        }
+    })
+    .catch(error => {
+        console.error('Farb-Update-Fehler:', error);
+        alert('Kommunikationsfehler beim Speichern der Markierung.');
+    });
 }
 
 

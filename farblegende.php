@@ -9,112 +9,86 @@ $pageTitle = "Farblegende für Markierungen";
 
 require_once 'header.php';
 
-// Definition der Farbmarkierungen
-// Diese Struktur sollte mit der in app.js (highlightColors Array) übereinstimmen
+// NEU: Definition der konsolidierten Farbmarkierungen
 $colorLegend = [
     [
-        'name' => 'Christus im AT',
-        'value' => 'yellow',
+        'name' => 'Gottes Wesen & Handeln',
+        'value' => 'god',
+        'cssClass' => 'bg-gods-work-custom',
+        'description' => 'Alles über Gottes Charakter, seine Eigenschaften, sein souveränes Wirken, die Schöpfung und seine Wunder.'
+    ],
+    [
+        'name' => 'Christus: Person & Prophetie',
+        'value' => 'christ_prophecy',
         'cssClass' => 'bg-warning',
-        'description' => 'Hinweise, Prophetien und typologische Bezüge auf Jesus Christus im Alten Testament.'
+        'description' => 'Verse über die Identität, Natur und Göttlichkeit Jesu. Beinhaltet Prophetien und typologische Hinweise auf ihn im AT.'
     ],
     [
-        'name' => 'Ermutigung, Trost & Hoffnung',
-        'value' => 'green',
-        'cssClass' => 'bg-green-custom',
-        'description' => 'Verse, die Ermutigung, Trost in schwierigen Zeiten oder Hoffnung auf Gottes Zusagen spenden.'
+        'name' => 'Christus: Lehre & Wirken',
+        'value' => 'christ_teaching',
+        'cssClass' => 'bg-miracle-custom',
+        'description' => 'Die Worte, Lehren, Gleichnisse und Taten/Wunder von Jesus während seines irdischen Dienstes.'
     ],
     [
-        'name' => 'Gebot & Weisung',
-        'value' => 'blue',
-        'cssClass' => 'bg-blue-custom',
-        'description' => 'Klare Gebote, Anweisungen Gottes und ethische Richtlinien für das Leben und den Glauben.'
-    ],
-    [
-        'name' => 'Sünde, Warnung & Gericht',
-        'value' => 'red',
+        'name' => 'Sünde & Umkehr',
+        'value' => 'sin_repentance',
         'cssClass' => 'bg-red-custom',
-        'description' => 'Hinweise auf Sünde, menschliches Versagen, Warnungen vor Konsequenzen und Gottes gerechtes Gericht.'
+        'description' => 'Verse über Sünde, menschliches Versagen, Warnungen vor dem Gericht, aber auch über Buße, Umkehr und Vergebung.'
     ],
     [
-        'name' => 'Prophetie & Erfüllung',
-        'value' => 'orange',
-        'cssClass' => 'bg-orange-custom',
-        'description' => 'Weissagungen, prophetische Worte über zukünftige Ereignisse und deren Erfüllung, oft in Bezug auf Christus oder die Endzeit.'
+        'name' => 'Gesetz & Bund',
+        'value' => 'law_covenant',
+        'cssClass' => 'bg-law-custom',
+        'description' => 'Bezieht sich auf den Alten und Neuen Bund, die Zehn Gebote, das mosaische Gesetz und dessen Erfüllung in Christus.'
+    ],
+    [
+        'name' => 'Glaube & Erlösung',
+        'value' => 'faith_salvation',
+        'cssClass' => 'bg-sanctification-custom',
+        'description' => 'Zentrale Verse über Erlösung allein aus Gnade durch Glauben, Rechtfertigung und die Kernbotschaft des Evangeliums.'
+    ],
+     [
+        'name' => 'Heiliger Geist',
+        'value' => 'holy_spirit',
+        'cssClass' => 'bg-parable-custom',
+        'description' => 'Verse, die sich auf die Person, das Wirken, die Gaben und die Frucht des Heiligen Geistes beziehen.'
+    ],
+    [
+        'name' => 'Gebote & Ethik',
+        'value' => 'commandments',
+        'cssClass' => 'bg-blue-custom',
+        'description' => 'Klare Anweisungen, ethische Weisungen und Gebote für ein gottgefälliges Leben.'
+    ],
+    [
+        'name' => 'Ermutigung & Hoffnung',
+        'value' => 'hope',
+        'cssClass' => 'bg-green-custom',
+        'description' => 'Verse, die Trost, Hoffnung auf Gottes Zusagen und Ermutigung in allen Lebenslagen spenden.'
+    ],
+    [
+        'name' => 'Geistliches Wachstum',
+        'value' => 'growth',
+        'cssClass' => 'bg-rebuke-custom',
+        'description' => 'Aspekte der Heiligung, der Jüngerschaft und der praktischen Nachfolge im christlichen Leben.'
+    ],
+    [
+        'name' => 'Anbetung & Gebet',
+        'value' => 'worship',
+        'cssClass' => 'bg-worship-custom',
+        'description' => 'Psalmen, Gebete, Lobpreis, Anbetung und Ausdrücke der Dankbarkeit gegenüber Gott.'
+    ],
+    [
+        'name' => 'Gottes Volk & Gemeinde',
+        'value' => 'people_church',
+        'cssClass' => 'bg-name-custom',
+        'description' => 'Verse über Israel (AT) und die Gemeinde/Kirche (NT), deren Identität, Geschichte und Auftrag.'
     ],
     [
         'name' => 'Geschichte & Kontext',
-        'value' => 'brown',
+        'value' => 'history',
         'cssClass' => 'bg-brown-custom',
-        'description' => 'Historische Berichte, erzählerischer Rahmen, kultureller Hintergrund, Genealogien und geografische Angaben.'
+        'description' => 'Rein historische Berichte, Genealogien, kultureller und geografischer Kontext zum besseren Verständnis.'
     ],
-    [
-        'name' => 'Gleichnis, Lehre & Weißheit', // Kombiniert aus 'Gleichnis' und Aspekten von 'Weisheit/Lehre'
-        'value' => 'parable',
-        'cssClass' => 'bg-parable-custom',
-        'description' => 'Bildhafte Erzählungen (Gleichnisse), biblische Lehren, Prinzipien und allgemeine Lebensweisheiten.'
-    ],
-    [
-        'name' => 'Zurechtweisung & Umkehr',
-        'value' => 'rebuke',
-        'cssClass' => 'bg-rebuke-custom',
-        'description' => 'Verse, die Fehlverhalten aufzeigen, zur Selbstreflexion, Buße und Umkehr zu Gott aufrufen.'
-    ],
-    [
-        'name' => 'Israel & Gottes Volk', // Ehemals 'Namen (Orte & Personen)'
-        'value' => 'name', // Behält den alten 'value' für Konsistenz, falls bestehende Daten darauf basieren
-        'cssClass' => 'bg-name-custom',
-        'description' => 'Verse, die sich auf Gottes erwähltes Volk Israel (AT) und die Gemeinde als geistliches Israel (NT) beziehen – deren Berufung, Geschichte und Identität.'
-    ],
-    [
-        'name' => 'Heiligung, Erkenntnis & Wachstum', // Ehemals 'Heiligung / Nachfolge'
-        'value' => 'sanctification',
-        'cssClass' => 'bg-sanctification-custom',
-        'description' => 'Aspekte des geistlichen Wachstums, der Heiligung durch den Heiligen Geist, der tieferen Erkenntnis Gottes und der Jüngerschaft.'
-    ],
-    [
-        'name' => 'Christus Verheißung, Werke & Wort', // Ehemals 'Wunder'
-        'value' => 'miracle', // Behält den alten 'value'
-        'cssClass' => 'bg-miracle-custom',
-        'description' => 'Verse, die sich zentral auf Jesus Christus beziehen: seine Identität, Verheißungen, sein Wirken, seine Wunder und seine Lehren/Worte.'
-    ],
-    [
-        'name' => 'Gottes Wesen, Wirken & Wunder', // Ehemals 'Gottes Wirken / Handeln'
-        'value' => 'gods_work',
-        'cssClass' => 'bg-gods-work-custom',
-        'description' => 'Beschreibungen von Gottes Charakter, Eigenschaften, seinem souveränen Handeln, seinen Plänen und übernatürlichen Wundern.'
-    ],
-    [
-        'name' => 'Gesetz & Alter Bund', // Ehemals 'Gesetz'
-        'value' => 'law',
-        'cssClass' => 'bg-law-custom',
-        'description' => 'Gesetzliche Bestimmungen, insbesondere das mosaische Gesetz und der Alte Bund Gottes mit Israel.'
-    ],
-    [
-        'name' => 'Weisheit & Lehre', // Beibehalten für spezifische Weisheitsliteratur
-        'value' => 'wisdom',
-        'cssClass' => 'bg-wisdom-custom',
-        'description' => 'Spezifische Weisheitsliteratur (z.B. Sprüche, Prediger), tiefere biblische Lehren und Prinzipien für ein gottgefälliges Leben.'
-    ],
-    [
-        'name' => 'Anbetung, Gebet & Lobpreis', // Ehemals 'Anbetung / Lobpreis / Gebet'
-        'value' => 'worship',
-        'cssClass' => 'bg-worship-custom',
-        'description' => 'Ausdrücke der Anbetung, Psalmen, Gebete, Lobpreisungen und Dankbarkeit gegenüber Gott.'
-    ],
-    [
-        'name' => 'Neuer Bund', // Ehemals 'Bund'
-        'value' => 'covenant',
-        'cssClass' => 'bg-covenant-custom',
-        'description' => 'Verse, die sich auf den Neuen Bund durch Jesus Christus beziehen, das Abendmahl und die Erlösung durch sein Blut.'
-    ],
-    [
-        'name' => 'Menschliche Natur & Zustand', // Ehemals 'Unklar / Sonstiges'
-        'value' => 'gray',
-        'cssClass' => 'bg-gray-custom',
-        'description' => 'Verse über das Wesen des Menschen, seine Erschaffenheit, Begrenztheit, seinen Zustand vor Gott (auch den inneren Kampf).'
-    ]
-   
 ];
 
 ?>

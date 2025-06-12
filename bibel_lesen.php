@@ -267,28 +267,26 @@ require_once 'header.php';
     <?php if (!empty($versesWithDetails)): ?>
         <?php foreach ($versesWithDetails as $verse): ?>
             <?php 
-                // ... (Ihre bestehende Logik zum Setzen von $highlightClass und $importantClass) ...
+               
                 $highlightColorValue = $globalHighlights[$verse['global_verse_id']] ?? null; 
                 $highlightClass = '';
                 if ($highlightColorValue) {
+                    // NEU: Angepasste switch-Anweisung
                     switch ($highlightColorValue) {
-                        case 'yellow': $highlightClass = 'bg-warning'; break;
-                        case 'green':  $highlightClass = 'bg-green-custom'; break;
-                        case 'blue':   $highlightClass = 'bg-blue-custom'; break;
-                        case 'red':    $highlightClass = 'bg-red-custom'; break;
-                        case 'orange': $highlightClass = 'bg-orange-custom'; break;
-                        case 'brown':  $highlightClass = 'bg-brown-custom'; break;
-                        case 'gray':   $highlightClass = 'bg-gray-custom'; break;
-                        case 'parable': $highlightClass = 'bg-parable-custom'; break;
-                        case 'rebuke':  $highlightClass = 'bg-rebuke-custom'; break;
-                        case 'name':    $highlightClass = 'bg-name-custom'; break;
-                        case 'sanctification': $highlightClass = 'bg-sanctification-custom'; break;
-                        case 'miracle': $highlightClass = 'bg-miracle-custom'; break;
-                        case 'gods_work': $highlightClass = 'bg-gods-work-custom'; break;
-                        case 'law':     $highlightClass = 'bg-law-custom'; break;
-                        case 'wisdom':  $highlightClass = 'bg-wisdom-custom'; break;
-                        case 'worship': $highlightClass = 'bg-worship-custom'; break;
-                        case 'covenant':$highlightClass = 'bg-covenant-custom'; break;
+                        case 'god':               $highlightClass = 'bg-gods-work-custom'; break;
+                        case 'christ_prophecy':   $highlightClass = 'bg-warning'; break;
+                        case 'christ_teaching':   $highlightClass = 'bg-miracle-custom'; break;
+                        case 'sin_repentance':    $highlightClass = 'bg-red-custom'; break;
+                        case 'law_covenant':      $highlightClass = 'bg-law-custom'; break;
+                        case 'faith_salvation':   $highlightClass = 'bg-sanctification-custom'; break;
+                        case 'holy_spirit':       $highlightClass = 'bg-parable-custom'; break;
+                        case 'commandments':      $highlightClass = 'bg-blue-custom'; break;
+                        case 'hope':              $highlightClass = 'bg-green-custom'; break;
+                        case 'growth':            $highlightClass = 'bg-rebuke-custom'; break;
+                        case 'worship':           $highlightClass = 'bg-worship-custom'; break;
+                        case 'people_church':     $highlightClass = 'bg-name-custom'; break;
+                        case 'history':           $highlightClass = 'bg-brown-custom'; break;
+                        // Alte Klassen sind nicht mehr nötig nach der Migration
                     }
                 }
                 $importantClass = $verse['is_important_for_user'] ? 'user-important-verse-text' : '';
